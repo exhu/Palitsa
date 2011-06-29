@@ -1,0 +1,8 @@
+PALITSA is a media catalogue application. 
+
+It's planned to be separated into several levels, 
+a) the core, which implements database access and filesystem scanning,
+b) the command line interface,
+c) the graphical user interface.
+
+See src/LICENSE for disclaimer etc.
