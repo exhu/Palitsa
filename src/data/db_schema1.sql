@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 
 -- system info table
 CREATE TABLE db_desc (version_num INT, version_str TEXT);
-INSERT INTO db_desc VALUES(101, "diskat 1.1");
+INSERT INTO db_desc VALUES(101, "palitsa 1.1");
 
 -- media source info table
 CREATE TABLE media_desc (id INTEGER PRIMARY KEY, name TEXT, original_path TEXT, scan_time INTEGER, root_id INTEGER, FOREIGN KEY(root_id) REFERENCES dir_entry_desc(id));

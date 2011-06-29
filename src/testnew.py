@@ -1,5 +1,5 @@
-from mediakat.core.db_sqlite import DBSqLite
-from mediakat.core.data import MediaDesc
+from palitsa.core.db_sqlite import DBSqLite
+from palitsa.core.data import MediaDesc
 
 import logging
 

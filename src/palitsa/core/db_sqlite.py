@@ -1,9 +1,9 @@
 # --- sqlite implementation of db interface ---
-from mediakat.core.db import DBGeneric
-from mediakat.core.db import MediaDescDAO
-from mediakat.core.data import MediaDesc
+from palitsa.core.db import DBGeneric
+from palitsa.core.db import MediaDescDAO
+from palitsa.core.data import MediaDesc
 
-from mediakat.core.db import DB_VERSION_NUM
+from palitsa.core.db import DB_VERSION_NUM
 
 import sqlite3
 import os
@@ -11,7 +11,7 @@ import logging
 
 _logger = logging.getLogger('db_sqlite')
 
-_DB_SCHEMA = "db_schema1.sql"
+_DB_SCHEMA = "data/db_schema1.sql"
 
 class DBSqLite(DBGeneric):
     def create_new(self):
