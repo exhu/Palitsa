@@ -43,7 +43,8 @@ class DBSqLite(DBGeneric):
         self.connection = sqlite3.connect(self.filename)
         # check version
         cur = self.connection.cursor()
-        cur.execute("select * from db_desc where version_num = ?", (DB_VERSION_NUM))
+        print("DBVER = %i" % DB_VERSION_NUM)
+        cur.execute("select * from db_desc where version_num = ?", (DB_VERSION_NUM,))
         ver = cur.fetchone()
 
         _logger.info(self.filename)

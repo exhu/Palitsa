@@ -3,7 +3,7 @@
 class DBDesc:
     def __init__(self):
         self.version_num = 1
-        self.version_str = "diskat 1.0"
+        self.version_str = "palitsa 1.0"
 
 
 class MediaDesc:
