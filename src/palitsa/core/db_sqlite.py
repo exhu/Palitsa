@@ -85,7 +85,7 @@ class SQLiteMediaDescDAO(MediaDescDAO):
 
     def find(self, media_desc_id):        
         cur = self.dbo.connection.cursor()
-        cur.execute('SELECT id, name, original_path, root_id FROM media_desc WHERE id = 1')#, (media_desc_id))        
+        cur.execute('SELECT id, name, original_path, root_id FROM media_desc WHERE id = ?', (media_desc_id,))        
         res = cur.fetchone()
         md = None
         if res is not None:
