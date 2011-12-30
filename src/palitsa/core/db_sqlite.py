@@ -77,7 +77,8 @@ class SQLiteMediaDescDAO(MediaDescDAO):
         cur.execute('INSERT INTO media_desc (name, original_path, root_id) VALUES(?, ?, ?)', (media_desc.name, media_desc.original_path, media_desc.root_id))
         self.dbo.connection.commit()
         # last_insert_rowid()
-        cur.execute('SELECT id FROM media_desc WHERE id = last_insert_rowid()')
+        #cur.execute('SELECT id FROM media_desc WHERE id = last_insert_rowid()')
+        cur.execute('select last_insert_rowid()')
         media_desc.id = cur.fetchone()[0]
 
         cur.close()
