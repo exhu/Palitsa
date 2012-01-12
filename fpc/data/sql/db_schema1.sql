@@ -2,17 +2,21 @@
 PRAGMA foreign_keys = ON;
 
 -- system info table
-CREATE TABLE db_desc (version_num INT, version_str TEXT);
+CREATE TABLE db_desc (version_num INT, version_str TEXT, notes TEXT);
 INSERT INTO db_desc VALUES(102, "palitsa 1.2");
 
 -- ids generator
 CREATE TABLE id_seq (id INTEGER PRIMARY KEY, table_name TEXT UNIQUE, nextv INTEGER);
 
 -- media source info table
-CREATE TABLE media_desc (id INTEGER PRIMARY KEY, name TEXT, original_path TEXT, scan_time INTEGER, root_id INTEGER, FOREIGN KEY(root_id) REFERENCES dir_entry_desc(id));
+CREATE TABLE media_desc (id INTEGER PRIMARY KEY, 
+	name TEXT, original_path TEXT, scan_time INTEGER, root_id INTEGER, 
+	FOREIGN KEY(root_id) REFERENCES dir_entry_desc(id));
 
 -- main table with directory entries, if parent_id is NULL then this is the root, look for media_desc with root_id = this.id
-CREATE TABLE dir_entry_desc(id INTEGER PRIMARY KEY, parent_id INTEGER, dir_path TEXT, name TEXT, file_size INTEGER, mtime INTEGER, desc_id INTEGER,
+CREATE TABLE dir_entry_desc(id INTEGER PRIMARY KEY, parent_id INTEGER, 
+	dir_path TEXT, name TEXT, file_size INTEGER, mtime INTEGER, 
+	desc_id INTEGER,
     FOREIGN KEY(parent_id) REFERENCES dir_entry_desc(id),  FOREIGN KEY(desc_id) REFERENCES text_desc(id));
 
 -- text descriptions table

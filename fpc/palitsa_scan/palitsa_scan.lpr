@@ -6,7 +6,7 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp
+  Classes, SysUtils, CustApp, palitsa_base
   { you can add units after this };
 
 type
