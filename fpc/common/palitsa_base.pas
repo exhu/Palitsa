@@ -51,6 +51,16 @@ type
     procedure update_notes(n : string); virtual; abstract;
   end;
 
+  TBaseMediaDescDAO = class
+    /// allocates id, inits fields to default values
+    procedure alloc(out e : TMediaDescEntity); virtual; abstract;
+
+    function get(id : int64; out e : TMediaDescEntity) : boolean; virtual; abstract;
+    function insert(var e : TMediaDescEntity) : boolean; virtual; abstract;
+
+    function update_name(var e : TMediaDescEntity) : boolean; virtual; abstract;
+  end;
+
 implementation
 
 end.
