@@ -11,11 +11,29 @@ const
   PALITSA_DB_VER = 102;
   PALITSA_DB_VER_STR = '1.2';
 
+  NULL_ID = -1; //< like NULL in SQL for int64 fields.
+
 type
   PMediaDescEntity = ^TMediaDescEntity;
   TMediaDescEntity = record
     id : int64;
+    name : string;
+    original_path : string;
+    scan_time : longint;
 
+    /// dir_entry_desc id
+    root_id : int64;
+  end;
+
+  PDirEntryDescEntity = ^TDirEntryDescEntity;
+  TDirEntryDescEntity = record
+    id : int64;
+    parent_id : int64; //< null if root
+    dir_path : string;
+    name : string;
+    file_size : int64;
+    mtime : longint;
+    desc_id : int64; //< description entity id (optional)
   end;
 
 
