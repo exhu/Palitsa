@@ -11,12 +11,21 @@ const
   PALITSA_DB_VER = 102;
   PALITSA_DB_VER_STR = '1.2';
 
-  NULL_ID = -1; //< like NULL in SQL for int64 fields.
+  NULL_ID = 0; //< like NULL in SQL for int64 fields.
 
 type
-  PMediaDescEntity = ^TMediaDescEntity;
-  TMediaDescEntity = record
-    id : int64;
+
+  { TEntity }
+
+  TEntity = class
+    id: int64;
+
+
+  end;
+
+  { TMediaDescEntity }
+
+  TMediaDescEntity = class(TEntity)
     name : string;
     original_path : string;
     scan_time : longint;
@@ -25,15 +34,17 @@ type
     root_id : int64;
   end;
 
-  PDirEntryDescEntity = ^TDirEntryDescEntity;
-  TDirEntryDescEntity = record
-    id : int64;
+
+  { TDirEntryDescEntity }
+
+  TDirEntryDescEntity = class(TEntity)
     parent_id : int64; //< null if root
     dir_path : string;
     name : string;
     file_size : int64;
     mtime : longint;
     desc_id : int64; //< description entity id (optional)
+
   end;
 
 
@@ -52,16 +63,17 @@ type
   end;
 
   TBaseMediaDescDAO = class
-    /// allocates id, inits fields to default values
-    procedure alloc(out e : TMediaDescEntity); virtual; abstract;
+    function get(id: int64): TMediaDescEntity; virtual; abstract;
+    function insert(e: TMediaDescEntity) : boolean; virtual; abstract;
 
-    function get(id : int64; out e : TMediaDescEntity) : boolean; virtual; abstract;
-    function insert(var e : TMediaDescEntity) : boolean; virtual; abstract;
+    function update_name(e : TMediaDescEntity) : boolean; virtual; abstract;
 
-    function update_name(var e : TMediaDescEntity) : boolean; virtual; abstract;
+    function remove(e : TMediaDescEntity) : boolean; virtual; abstract;
   end;
 
 implementation
+
+
 
 end.
 

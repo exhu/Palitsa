@@ -29,19 +29,19 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <LaunchingApplication PathPlusParams="/usr/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+        <LaunchingApplication Use="True" PathPlusParams="/usr/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
-    <Units Count="2">
+    <Units Count="3">
       <Unit0>
         <Filename Value="palitsa_scan.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_scan"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="11"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="23"/>
+        <CursorPos X="10" Y="36"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -49,15 +49,25 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_base"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="54" Y="22"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="10"/>
+        <CursorPos X="29" Y="28"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/packages/fcl-base/src/custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="45"/>
+        <CursorPos X="25" Y="62"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit2>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="../common/palitsa_base.pas"/>
         <Caret Line="23" Column="7" TopLine="1"/>
@@ -66,6 +76,34 @@
         <Filename Value="../common/palitsa_base.pas"/>
         <Caret Line="22" Column="54" TopLine="1"/>
       </Position2>
+      <Position3>
+        <Filename Value="palitsa_scan.lpr"/>
+        <Caret Line="34" Column="13" TopLine="12"/>
+      </Position3>
+      <Position4>
+        <Filename Value="palitsa_scan.lpr"/>
+        <Caret Line="32" Column="22" TopLine="23"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../common/palitsa_base.pas"/>
+        <Caret Line="43" Column="3" TopLine="25"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../common/palitsa_base.pas"/>
+        <Caret Line="54" Column="28" TopLine="9"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../common/palitsa_base.pas"/>
+        <Caret Line="23" Column="17" TopLine="1"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../common/palitsa_base.pas"/>
+        <Caret Line="36" Column="18" TopLine="12"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../common/palitsa_base.pas"/>
+        <Caret Line="50" Column="24" TopLine="25"/>
+      </Position9>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

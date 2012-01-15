@@ -3,10 +3,16 @@ PRAGMA foreign_keys = ON;
 
 -- system info table
 CREATE TABLE db_desc (version_num INT, version_str TEXT, notes TEXT);
-INSERT INTO db_desc VALUES(102, "palitsa 1.2");
+INSERT INTO db_desc VALUES(102, "palitsa 1.2", "");
 
 -- ids generator
-CREATE TABLE id_seq (id INTEGER PRIMARY KEY, table_name TEXT UNIQUE, nextv INTEGER);
+CREATE TABLE id_seq (table_name TEXT PRIMARY KEY, nextv INTEGER);
+INSERT INTO id_seq VALUES("media_desc", 1);
+INSERT INTO id_seq VALUES("dir_entry_desc", 1);
+INSERT INTO id_seq VALUES("text_desc", 1);
+INSERT INTO id_seq VALUES("tag_desc", 1);
+INSERT INTO id_seq VALUES("tag_dir_entry_assoc", 1);
+
 
 -- media source info table
 CREATE TABLE media_desc (id INTEGER PRIMARY KEY, 
