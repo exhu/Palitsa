@@ -32,42 +32,90 @@
         <LaunchingApplication Use="True" PathPlusParams="/usr/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
-    <Units Count="3">
+    <Units Count="8">
       <Unit0>
         <Filename Value="palitsa_scan.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_scan"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="23"/>
-        <CursorPos X="10" Y="36"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="1"/>
+        <CursorPos X="36" Y="6"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="../common/palitsa_base.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_base"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="10"/>
+        <TopLine Value="42"/>
         <CursorPos X="29" Y="28"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="/usr/share/fpcsrc/2.4.4/packages/fcl-base/src/custapp.pp"/>
         <UnitName Value="CustApp"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
         <TopLine Value="45"/>
         <CursorPos X="25" Y="62"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="../common/palitsa_scanner.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="palitsa_scanner"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="7"/>
+        <CursorPos X="60" Y="40"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/unix/sysutils.pp"/>
+        <UnitName Value="sysutils"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="12"/>
+        <CursorPos X="11" Y="41"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/sysutilh.inc"/>
+        <EditorIndex Value="4"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="4" Y="38"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/filutilh.inc"/>
+        <EditorIndex Value="5"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="57"/>
+        <CursorPos X="23" Y="88"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/inc/objpash.inc"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="172"/>
+        <CursorPos X="8" Y="180"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit7>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="../common/palitsa_base.pas"/>
         <Caret Line="23" Column="7" TopLine="1"/>
@@ -104,6 +152,22 @@
         <Filename Value="../common/palitsa_base.pas"/>
         <Caret Line="50" Column="24" TopLine="25"/>
       </Position9>
+      <Position10>
+        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/filutilh.inc"/>
+        <Caret Line="21" Column="16" TopLine="1"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../common/palitsa_scanner.pas"/>
+        <Caret Line="16" Column="45" TopLine="1"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../common/palitsa_scanner.pas"/>
+        <Caret Line="25" Column="1" TopLine="1"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../common/palitsa_scanner.pas"/>
+        <Caret Line="16" Column="30" TopLine="1"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
