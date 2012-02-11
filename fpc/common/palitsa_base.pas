@@ -11,7 +11,7 @@ const
   PALITSA_DB_VER = 102;
   PALITSA_DB_VER_STR = '1.2';
 
-  NULL_ID = 0; //< like NULL in SQL for int64 fields.
+  NULL_ID = 0; //< like NULL in SQL for int64 fields, id generator must gen id > 0
 
 type
 

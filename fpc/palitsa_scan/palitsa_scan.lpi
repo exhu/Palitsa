@@ -41,7 +41,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="23"/>
         <CursorPos X="10" Y="36"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -51,9 +51,9 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="10"/>
-        <CursorPos X="29" Y="28"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="43"/>
+        <CursorPos X="43" Y="59"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -61,9 +61,9 @@
         <UnitName Value="CustApp"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="45"/>
-        <CursorPos X="25" Y="62"/>
-        <UsageCount Value="13"/>
+        <TopLine Value="67"/>
+        <CursorPos X="27" Y="48"/>
+        <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit2>
     </Units>
