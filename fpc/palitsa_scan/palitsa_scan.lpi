@@ -6,11 +6,11 @@
       <Flags>
         <MainUnitHasCreateFormStatements Value="False"/>
       </Flags>
+      <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
-      <ActiveWindowIndexAtStart Value="0"/>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
@@ -18,7 +18,7 @@
     <VersionInfo>
       <StringTable ProductVersion=""/>
     </VersionInfo>
-    <BuildModes Count="1" Active="Default">
+    <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
     <PublishOptions>
@@ -32,144 +32,23 @@
         <LaunchingApplication Use="True" PathPlusParams="/usr/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
-    <Units Count="8">
+    <Units Count="3">
       <Unit0>
         <Filename Value="palitsa_scan.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_scan"/>
-        <EditorIndex Value="0"/>
-        <WindowIndex Value="0"/>
-
-        <TopLine Value="23"/>
-        <CursorPos X="10" Y="36"/>
-        <UsageCount Value="28"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="../common/palitsa_base.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_base"/>
-        <EditorIndex Value="7"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="43"/>
-        <CursorPos X="43" Y="59"/>
-        <UsageCount Value="28"/>
-        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/packages/fcl-base/src/custapp.pp"/>
-        <UnitName Value="CustApp"/>
-        <EditorIndex Value="6"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="67"/>
-        <CursorPos X="27" Y="48"/>
-        <UsageCount Value="14"/>
-        <Loaded Value="True"/>
-      </Unit2>
-      <Unit3>
         <Filename Value="../common/palitsa_scanner.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="palitsa_scanner"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="7"/>
-        <CursorPos X="60" Y="40"/>
-        <UsageCount Value="21"/>
-        <Loaded Value="True"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/unix/sysutils.pp"/>
-        <UnitName Value="sysutils"/>
-        <EditorIndex Value="3"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="12"/>
-        <CursorPos X="11" Y="41"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/sysutilh.inc"/>
-        <EditorIndex Value="4"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="4" Y="38"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/filutilh.inc"/>
-        <EditorIndex Value="5"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="57"/>
-        <CursorPos X="23" Y="88"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/inc/objpash.inc"/>
-        <EditorIndex Value="2"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="172"/>
-        <CursorPos X="8" Y="180"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit7>
+      </Unit2>
     </Units>
-    <JumpHistory Count="13" HistoryIndex="12">
-      <Position1>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="23" Column="7" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="22" Column="54" TopLine="1"/>
-      </Position2>
-      <Position3>
-        <Filename Value="palitsa_scan.lpr"/>
-        <Caret Line="34" Column="13" TopLine="12"/>
-      </Position3>
-      <Position4>
-        <Filename Value="palitsa_scan.lpr"/>
-        <Caret Line="32" Column="22" TopLine="23"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="43" Column="3" TopLine="25"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="54" Column="28" TopLine="9"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="23" Column="17" TopLine="1"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="36" Column="18" TopLine="12"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../common/palitsa_base.pas"/>
-        <Caret Line="50" Column="24" TopLine="25"/>
-      </Position9>
-      <Position10>
-        <Filename Value="/usr/share/fpcsrc/2.4.4/rtl/objpas/sysutils/filutilh.inc"/>
-        <Caret Line="21" Column="16" TopLine="1"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../common/palitsa_scanner.pas"/>
-        <Caret Line="16" Column="45" TopLine="1"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../common/palitsa_scanner.pas"/>
-        <Caret Line="25" Column="1" TopLine="1"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../common/palitsa_scanner.pas"/>
-        <Caret Line="16" Column="30" TopLine="1"/>
-      </Position13>
-    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="9"/>
@@ -182,6 +61,9 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Other>
+      <CompilerMessages>
+        <UseMsgFile Value="True"/>
+      </CompilerMessages>
       <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>

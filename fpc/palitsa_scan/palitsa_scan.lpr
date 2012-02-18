@@ -73,7 +73,6 @@ var
 
 begin
   Application:=TScanDirApplication.Create(nil);
-  Application.Title:='Palitsa scandir';
   Application.Run;
   Application.Free;
 end.

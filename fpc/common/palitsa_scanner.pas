@@ -10,15 +10,17 @@ uses
 type
   TBaseDirScanner = class;
 
-  TDirScannerEnterEvent = procedure(o : TBaseDirScanner; path, name : string) of object;
+  TDirScannerEnterLeaveEvent = procedure(o : TBaseDirScanner; path, name : string) of object;
   TDirScannerFoundEvent = procedure(o : TBaseDirScanner; var f : TSearchRec) of object;
 
   TBaseDirScanner = class(TObject)
   private
-    FOnEnterDirectory : TDirScannerEnterEvent;
+    FOnEnterDirectory : TDirScannerEnterLeaveEvent;
+    FOnLeaveDirectory : TDirScannerEnterLeaveEvent;
     FOnFoundEntry : TDirScannerFoundEvent;
   public
-    property OnEnterDirectory : TDirScannerEnterEvent read FOnEnterDirectory write FOnEnterDirectory;
+    property OnEnterDirectory : TDirScannerEnterLeaveEvent read FOnEnterDirectory write FOnEnterDirectory;
+    property OnLeaveDirectory : TDirScannerEnterLeaveEvent read FOnLeaveDirectory write FOnLeaveDirectory;
     property OnFoundEntry : TDirScannerFoundEvent read FOnFoundEntry write FOnFoundEntry;
 
 
