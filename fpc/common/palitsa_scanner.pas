@@ -10,8 +10,8 @@ uses
 type
   TBaseDirScanner = class;
 
-  TDirScannerEnterLeaveEvent = procedure(o : TBaseDirScanner; path, name : string) of object;
-  TDirScannerFoundEvent = procedure(o : TBaseDirScanner; var f : TSearchRec) of object;
+  TDirScannerEnterLeaveEvent = procedure(o : TBaseDirScanner; path : string) of object;
+  TDirScannerFoundEvent = procedure(o : TBaseDirScanner; path : string; var f : TSearchRec) of object;
 
   TBaseDirScanner = class(TObject)
   private
@@ -57,8 +57,43 @@ end;
 { TImplDirScanner }
 
 procedure TImplDirScanner.SearchFrom(path: string);
+var
+  rec : TSearchRec;
+  newPath : string;
+
 begin
   //inherited SearchFrom(path);
+  newPath := IncludeTrailingPathDelimiter(path) + '*';
+  //writeln(newPath);
+  if FindFirst(newPath, faAnyFile, rec) = 0 then
+  repeat
+    if (rec.Name <> '') and (rec.Name <> '.') and (rec.Name <> '..') then
+    begin
+      if Assigned(OnFoundEntry) then
+         OnFoundEntry(Self, path, rec);
+
+      if (rec.Attr and faDirectory) <> 0 then
+
+      begin
+        newPath := IncludeTrailingPathDelimiter(path) + rec.Name;
+
+        if Assigned(OnEnterDirectory) then
+        begin
+          OnEnterDirectory(Self, newPath);
+        end;
+
+        // recurse
+        SearchFrom(newPath);
+
+        if Assigned(OnLeaveDirectory) then
+        begin
+          OnLeaveDirectory(Self, newPath);
+        end;
+      end;
+    end;
+  until FindNext(rec) <> 0;
+
+  FindClose(rec);
 end;
 
 end.

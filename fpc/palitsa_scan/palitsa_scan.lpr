@@ -20,6 +20,10 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
     procedure WriteHelp; virtual;
+
+    ////
+    procedure OnEnterDirectory(o : TBaseDirScanner; path : string);
+    procedure OnFound(o : TBaseDirScanner; path : string; var f : TSearchRec);
   end;
 
 { TScanDirApplication }
@@ -27,6 +31,7 @@ type
 procedure TScanDirApplication.DoRun;
 var
   ErrorMsg: String;
+  dirsc : TBaseDirScanner;
 begin
   // quick check parameters
   ErrorMsg:=CheckOptions('h','help');
@@ -44,6 +49,13 @@ begin
   end;
 
   { add your program here }
+
+
+  dirsc := CreateBaseDirScanner;
+  dirsc.OnEnterDirectory:= @OnEnterDirectory;
+  dirsc.OnFoundEntry:= @OnFound;
+  dirsc.SearchFrom('/home/yuryb/man');
+  dirsc.Free;
 
   // stop program loop
   Terminate;
@@ -64,6 +76,18 @@ procedure TScanDirApplication.WriteHelp;
 begin
   { add your help code here }
   writeln('Usage: ',ExeName,' -h');
+end;
+
+procedure TScanDirApplication.OnEnterDirectory(o: TBaseDirScanner; path: string
+  );
+begin
+  writeln('Entering dir ' + path);
+end;
+
+procedure TScanDirApplication.OnFound(o: TBaseDirScanner; path: string;
+  var f: TSearchRec);
+begin
+  writeln('Found item ' + f.Name);
 end;
 
 var
