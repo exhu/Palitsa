@@ -5,8 +5,8 @@
 package palitsa.tests;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.CharBuffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
  */
 public class ConnectionTest {
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
         System.out.println("ConnectionTest...");
 
         Class.forName("org.h2.Driver");
@@ -35,7 +35,7 @@ public class ConnectionTest {
         
         // TODO read text
         //conn.
-        
+        System.in.read();
         
         conn.close();
     }
