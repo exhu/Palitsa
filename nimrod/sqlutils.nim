@@ -4,11 +4,11 @@ import strutils
 type
     TStatements* = seq[string]
 
-    TSqlParser = ref object
+    RSqlParser = ref object
         statements : TStatements
         curStatement: string
 
-proc parseLine(p : TSQLParser, s : string) =
+proc parseLine(p : RSQLParser, s: string) =
     var
         inComments = false
         possibleComments = false
@@ -27,6 +27,7 @@ proc parseLine(p : TSQLParser, s : string) =
             if possibleComments:
                 inComments = true
                 possibleComments = false
+                continue
             else:
                 possibleComments = true
                 continue
@@ -41,14 +42,24 @@ proc parseLine(p : TSQLParser, s : string) =
     
         
 proc ParseSqlFile*(fn : string) : TStatements =
-     var p : TSqlParser
-     new(p)
-     
-     
+  var p : RSqlParser
+  new(p)
+  p.curStatement = ""
+  p.statements = @[]
+  var f = open(fn)
+  var line: string = ""
+  while f.readLine(line):
+    p.parseLine(line)
+  close(f)
+  return p.statements
      
 # ------------------
         
 when isMainModule:
-    # test
-    #var tparser =
-    
+  var st : TStatements
+
+  st = ParseSqlFile("db_schema1_sqlite.sql")
+
+  for s in items(st):
+    echo s
+  
