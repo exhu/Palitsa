@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- *
+ * Splits SQL script into statements, removes comments.
  * @author yur
  */
-public class SqlParser {
+public final class SqlParser {
     Reader reader;
     List<String> statements;
     StringBuilder curStatement;
@@ -44,7 +44,7 @@ public class SqlParser {
     }
     
     
-    void appendStatement() {
+    private void appendStatement() {
         statements.add(curStatement.toString());
         curStatement.setLength(0);
     }

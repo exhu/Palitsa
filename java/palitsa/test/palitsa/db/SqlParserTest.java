@@ -44,8 +44,9 @@ public class SqlParserTest {
         instance.parseStatements();
         // TODO review the generated test code and remove the default call to fail.
         System.out.println(instance.getStatements().get(0));
-        System.out.println(instance.getStatements().get(1));
-        fail("The test case is a prototype.");
+        assertEquals(1, instance.getStatements().size());
+        //System.out.println(instance.getStatements().get(1));
+        //fail("The test case is a prototype.");
     }
 
     /**
