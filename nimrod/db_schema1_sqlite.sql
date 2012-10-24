@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 
 -- system info table
 CREATE TABLE db_desc (version_num INT, version_str TEXT, notes TEXT);
-INSERT INTO db_desc VALUES(102, "palitsa 1.2", "");
+INSERT INTO db_desc VALUES(103, "palitsa 1.3", "");
 
 -- ids generator
 CREATE TABLE id_seq (table_name TEXT PRIMARY KEY, nextv INTEGER);
@@ -21,7 +21,7 @@ CREATE TABLE media_desc (id INTEGER PRIMARY KEY,
 
 -- main table with directory entries, if parent_id is NULL then this is the root, look for media_desc with root_id = this.id
 CREATE TABLE dir_entry_desc(id INTEGER PRIMARY KEY, parent_id INTEGER, 
-	dir_path TEXT, name TEXT, file_size INTEGER, mtime INTEGER, 
+	dir_path TEXT, name TEXT, file_size INTEGER, mtime INTEGER, is_dir BOOLEAN,
 	desc_id INTEGER,
     FOREIGN KEY(parent_id) REFERENCES dir_entry_desc(id),  FOREIGN KEY(desc_id) REFERENCES text_desc(id));
 

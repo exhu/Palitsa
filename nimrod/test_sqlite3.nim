@@ -4,7 +4,7 @@ import os
 import sqlutils
 
 var
-    mydb : TDbConn
+  mydb : TDbConn
     
 let dbFile = "test.sqdb"
 let dbScript = "db_schema1_sqlite.sql"
@@ -18,4 +18,6 @@ for i in script:
 
 db_sqlite.close(mydb)
     
+discard stdin.readLine()
+
     

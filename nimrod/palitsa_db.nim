@@ -5,8 +5,8 @@ import times
 import sqlutils
 
 const
-    PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
-    PALITSA_SCHEMA_VERSION_INT* = 102
+    PALITSA_SCHEMA_FILE = "db_schema1_sqlite.sql"
+    PALITSA_SCHEMA_VERSION_INT = 103
 
 type
     TEntityId* = int64
@@ -24,7 +24,10 @@ type
 proc genIdFor(o: TOpenDb, t: TPalTable): TEntityId =
   # TODO generate id via id_seq table
 
-proc createMedia*(o: TOpenDb, name, path: string, scanTime: TTime) : tuple[mediaId, rootId: TEntityId] =
+proc createMedia*(o: TOpenDb, name, path: string, scanTime: TTime): tuple[mediaId, rootId: TEntityId] =
   # TODO create media_desc, and root node
 
-
+proc createEntry(o: TOpenDb, name, path: string, fileSize: int64, mTime: TTime, isDir: bool): TEntityId =
+    # TODO
+    
+    
