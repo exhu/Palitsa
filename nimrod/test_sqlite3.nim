@@ -17,7 +17,7 @@ for i in script:
   db_sqlite.exec mydb, TSqlQuery(i)
 
 db_sqlite.close(mydb)
-    
-discard stdin.readLine()
+   
+#discard stdin.readLine()
 
     

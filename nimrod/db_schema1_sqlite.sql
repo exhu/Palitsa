@@ -1,6 +1,8 @@
 -- creates tables into a db
 PRAGMA foreign_keys = ON;
 
+begin transaction;
+
 -- system info table
 CREATE TABLE db_desc (version_num INT, version_str TEXT, notes TEXT);
 INSERT INTO db_desc VALUES(103, "palitsa 1.3", "");
@@ -44,4 +46,7 @@ CREATE INDEX dir_entry_desc_parent_idx ON dir_entry_desc (parent_id);
 
 -- index to speed up search of directory entries by name
 CREATE INDEX dir_entry_desc_name_idx ON dir_entry_desc (name);
+
+
+commit;
 
