@@ -60,10 +60,12 @@ template InTransaction*(o: var TOpenDb, stmts: stmt) =
 proc genIdFor*(o: var TOpenDb, t: TPalTable): TEntityId =
   # TODO generate id via id_seq table
 
-proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): tuple[mediaId, rootId: TEntityId] =
+proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
+    tuple[mediaId, rootId: TEntityId] =
   # TODO create media_desc, and root node
 
-proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64, mTime: TTime, isDir: bool, parent: TEntityId): TEntityId =
+proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64, 
+    mTime: TTime, isDir: bool, parent: TEntityId): TEntityId =
     # TODO
     
     
