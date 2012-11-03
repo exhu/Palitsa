@@ -54,9 +54,10 @@ begin
   dirsc := CreateBaseDirScanner;
   dirsc.OnEnterDirectory:= @OnEnterDirectory;
   dirsc.OnFoundEntry:= @OnFound;
-  dirsc.SearchFrom('/home/yuryb/man');
+  dirsc.SearchFrom(ParamStr(1));//'/home/yuryb/man');
   dirsc.Free;
 
+  readln;
   // stop program loop
   Terminate;
 end;
