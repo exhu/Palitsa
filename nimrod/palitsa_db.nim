@@ -4,14 +4,16 @@ import times
 # ----
 import sqlutils
 
+type
+    TEntityId* = distinct int64
+
 const
-    PALITSA_SCHEMA_FILE = "db_schema1_sqlite.sql"
-    PALITSA_SCHEMA_VERSION_INT = 103
-    NULL_ID* = 0
+    PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
+    PALITSA_SCHEMA_VERSION_INT* = 103
+    NULL_ID* : TEntityId = TEntityId(0)
     ## we treat zero ID as SQL NULL. 
 
 type
-    TEntityId* = distinct int64
     TOpenDb* = object
         conn: TDbConn
         inTransaction: bool
@@ -33,19 +35,9 @@ type
         descId: TEntityId
 
 
-proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
-    # TODO open it
-    
-    
-proc closeDb*(o: var TOpenDb) =
-    # TODO
 
-proc beginTransaction*(o: var TOpenDb) =
-    # TODO
-
-proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
-    # TODO
-
+proc beginTransaction*(o: var TOpenDb)
+proc endTransaction*(o: var TOpenDb, rollback: bool = false)
 
 template InTransaction*(o: var TOpenDb, stmts: stmt) =
     o.beginTransaction
@@ -55,6 +47,35 @@ template InTransaction*(o: var TOpenDb, stmts: stmt) =
     except:
       o.endTransaction(true)
       raise
+
+
+
+
+proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =    
+    o.conn = db_sqlite.open(fn, "", "", "")
+    if recreate:
+        let script = parseSqlFile(PALITSA_SCHEMA_FILE)
+        for i in script:
+            #echo "executing '" & i & "'..."
+            inTransaction(o):
+                db_sqlite.exec o.conn, TSqlQuery(i)
+            
+    
+    
+proc closeDb*(o: var TOpenDb) =    
+    o.conn.close()
+
+proc beginTransaction*(o: var TOpenDb) =    
+    o.conn.exec sql"begin transaction;"
+    o.inTransaction = true
+
+proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
+    if not rollbacK:
+        o.conn.exec sql"commit;"
+    else:
+        o.conn.exec sql"rollback;"
+        
+    o.inTransaction = false
 
 
 proc genIdFor*(o: var TOpenDb, t: TPalTable): TEntityId =
@@ -70,8 +91,11 @@ proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64,
     
     
 
-var a: TOpenDb
-InTransaction(a):
-  discard genIdFor(a, ptDirEntryDesc)
+# ------------
+when isMainModule:
+    var a: TOpenDb
+    
+    a.openDb("ttt.db", recreate = true)
+    a.closeDb()
   
 

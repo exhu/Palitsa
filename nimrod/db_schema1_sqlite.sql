@@ -1,7 +1,7 @@
 -- creates tables into a db
 PRAGMA foreign_keys = ON;
 
-begin transaction;
+-- begin transaction;
 
 -- system info table
 CREATE TABLE db_desc (version_num INT, version_str TEXT, notes TEXT);
@@ -54,5 +54,5 @@ CREATE INDEX dir_entry_desc_parent_idx ON dir_entry_desc (parent_id);
 CREATE INDEX dir_entry_desc_name_idx ON dir_entry_desc (name);
 
 
-commit;
+-- commit;
 
