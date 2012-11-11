@@ -3,6 +3,7 @@ import db_sqlite
 import times
 # ----
 import sqlutils
+import parseutils
 
 type
     TEntityId* = distinct int64
@@ -78,8 +79,21 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
     o.inTransaction = false
 
 
-proc genIdFor*(o: var TOpenDb, t: TPalTable): TEntityId =
-  # TODO generate id via id_seq table
+proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
+    # TODO generate id via id_seq table
+    var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?", $t)
+    var id: BiggestInt
+    if nv.parseBiggestInt(id) == 0:
+        raise newException(EDb, "Failed to generate id for " & $t)
+    
+    result = TEntityId(id)    
+        
+    #    
+    #    inc id
+    #    o.conn.exec(sql"update id_seq set nextv = ? where table_name = ?", $id, $t)
+    o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
+    
+  
 
 proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
     tuple[mediaId, rootId: TEntityId] =
@@ -92,10 +106,5 @@ proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64,
     
 
 # ------------
-when isMainModule:
-    var a: TOpenDb
-    
-    a.openDb("ttt.db", recreate = true)
-    a.closeDb()
-  
+
 
