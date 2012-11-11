@@ -1,3 +1,5 @@
+import palitsa_db, unittest
+
 # TODO test id generation
 
     var a: TOpenDb
