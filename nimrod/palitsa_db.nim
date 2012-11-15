@@ -2,9 +2,11 @@
 import db_sqlite
 import times
 import logging
+import os
 # ----
 import sqlutils
 import parseutils
+
 
 type
     TEntityId* = distinct int64
@@ -20,7 +22,7 @@ type
         conn: TDbConn
         inTransaction: bool
         
-    TPalTable = enum
+    TPalTable* = enum
         ptMediaDesc = "media_desc",
         ptDirEntryDesc = "dir_entry_desc",
         ptTextDesc = "text_desc",
@@ -41,25 +43,31 @@ type
 proc beginTransaction*(o: var TOpenDb)
 proc endTransaction*(o: var TOpenDb, rollback: bool = false)
 
-template InTransaction*(o: var TOpenDb, stmts: stmt) =
+template InTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
     o.beginTransaction
     try:
       stmts
-      o.endTransaction
+      o.endTransaction(rollback)
     except:
       o.endTransaction(true)
       raise
 
 
+template InTransaction*(o: var TOpenDb, stmts: stmt) =
+    InTransaction(o, rollback = false):
+        stmts
 
 
-proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =    
+
+proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =  
+    if recreate:
+        removeFile fn
     o.conn = db_sqlite.open(fn, "", "", "")
     if recreate:
         let script = parseSqlFile(PALITSA_SCHEMA_FILE)
-        for i in script:
-            #echo "executing '" & i & "'..."
-            inTransaction(o):
+        inTransaction(o):
+            for i in script:
+                #echo "executing '" & i & "'..."
                 db_sqlite.exec o.conn, TSqlQuery(i)
             
     
@@ -88,10 +96,6 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
         raise newException(EDb, "Failed to generate id for " & $t)
     
     result = TEntityId(id)    
-        
-    #    
-    #    inc id
-    #    o.conn.exec(sql"update id_seq set nextv = ? where table_name = ?", $id, $t)
     o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
     
   
