@@ -14,9 +14,9 @@ suite "db open suite":
     test "genId":
         inTransaction(myDb):
             var id1 = myDb.genIdFor(ptMediaDesc)
-            check BiggestInt(id1) > 0
+            check id1 > 0'i64
             var id2 = myDb.genIdFor(ptMediaDesc)
-            check BiggestInt(id2) > 1
+            check id2 > 1'i64
             
     test "genId fail rollback":
         var idBeforeFail: TEntityId

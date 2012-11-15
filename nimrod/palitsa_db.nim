@@ -11,11 +11,19 @@ import palitsa_sqlutils
 
 type
     TEntityId* = distinct int64
+    
+
+#proc `<` * (x, y: TEntityId): bool {.borrow.}
+#proc `<=` * (x, y: TEntityId): bool {.borrow.}
+#proc `==` * (x, y: TEntityId): bool {.borrow.}
+converter toInt64*(x: TEntityId): int64 = int64(x)
+converter toEntityId*(x: int64): TEntityId = TEntityId(x)
+
 
 const
     PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
     PALITSA_SCHEMA_VERSION_INT* = 103
-    NULL_ID* : TEntityId = TEntityId(0)
+    NULL_ID* : TEntityId = 0'i64
     ## we treat zero ID as SQL NULL. 
 
 type
@@ -96,7 +104,7 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     if nv.parseBiggestInt(id) == 0:
         raise newException(EDb, "Failed to generate id for " & $t)
     
-    result = TEntityId(id)    
+    result = id    
     o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
     
   
