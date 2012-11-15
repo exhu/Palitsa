@@ -3,9 +3,10 @@ import db_sqlite
 import times
 import logging
 import os
-# ----
-import sqlutils
 import parseutils
+# ----
+import palitsa_sqlutils
+
 
 
 type
@@ -89,7 +90,7 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
 
 
 proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
-    # generate id via id_seq table
+    ## generate id via id_seq table
     var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?", $t)
     var id: BiggestInt
     if nv.parseBiggestInt(id) == 0:
