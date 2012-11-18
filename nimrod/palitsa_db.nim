@@ -117,7 +117,15 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
 
 proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
     tuple[mediaId, rootId: TEntityId] =
-  # TODO create media_desc, and root node
+    # create media_desc, and root node
+    result.mediaId = o.genIdFor(ptMediaDesc)
+    result.rootId = o.genIdFor(ptDirEntryDesc)
+    o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, root_id) values(" &
+        "?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, path, int64(scanTime), result.rootId)
+    
+    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
+        "values(?,NULL,'','/',0,?,1, NULL);"), $ptDirEntryDesc, result.rootId, int64(scanTime))
+
 
 proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64, 
     mTime: TTime, isDir: bool, parent: TEntityId): TEntityId =

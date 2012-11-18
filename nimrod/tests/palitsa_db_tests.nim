@@ -29,9 +29,10 @@ suite "db open suite":
             check BiggestInt(id) == BiggestInt(idBeforeFail)
 
     test "createMedia":
-        var t: TTime
-        var mediaId, rootId = myDb.createMedia("name", "path", t)
-        echo "todo"
+        inTransaction(myDb):
+            var t: TTime
+            var m = myDb.createMedia("name", "path", t)
+            echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
 
     test "double transaction fail":
         myDb.beginTransaction
