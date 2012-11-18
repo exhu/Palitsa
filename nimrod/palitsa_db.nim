@@ -25,8 +25,11 @@ const
     PALITSA_SCHEMA_VERSION_INT* = 103
     NULL_ID* : TEntityId = 0'i64
     ## we treat zero ID as SQL NULL. 
+    ## So zero ID is never used to identify existing row!
 
 type
+    EMultiTransaction* = object of EDB
+
     TOpenDb* = object
         conn: TDbConn
         inTransaction: bool
@@ -84,7 +87,10 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
 proc closeDb*(o: var TOpenDb) =    
     o.conn.close()
 
-proc beginTransaction*(o: var TOpenDb) =    
+proc beginTransaction*(o: var TOpenDb) =
+    if o.inTransaction:
+        raise newException(EMultiTransaction, "already in transaction!")
+        
     o.conn.exec sql"begin transaction;"
     o.inTransaction = true
 

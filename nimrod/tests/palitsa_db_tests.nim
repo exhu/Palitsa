@@ -1,3 +1,5 @@
+import times
+
 import palitsa_db, unittest
 
 suite "db open suite":
@@ -26,12 +28,20 @@ suite "db open suite":
             var id = myDb.genIdFor(ptMediaDesc)
             check BiggestInt(id) == BiggestInt(idBeforeFail)
 
+    test "createMedia":
+        var t: TTime
+        var mediaId, rootId = myDb.createMedia("name", "path", t)
+        echo "todo"
 
+    test "double transaction fail":
+        myDb.beginTransaction
+        try:
+            myDb.beginTransaction
+        except EMultiTransaction:
+            nil
+        
+        finally:
+            myDb.endTransaction(rollback = true)
+            
 
-# TODO test id generation
-
-# var a: TOpenDb
-# 
-# a.openDb("ttt.db", recreate = true)
-# a.closeDb()
   
