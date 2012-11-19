@@ -16,9 +16,9 @@ suite "db open suite":
     test "genId":
         inTransaction(myDb):
             var id1 = myDb.genIdFor(ptMediaDesc)
-            check id1 > 0'i64
+            check toInt64(id1) > 0'i64
             var id2 = myDb.genIdFor(ptMediaDesc)
-            check id2 > 1'i64
+            check toInt64(id2) > 1'i64
             
     test "genId fail rollback":
         var idBeforeFail: TEntityId
@@ -45,4 +45,4 @@ suite "db open suite":
             myDb.endTransaction(rollback = true)
             
 
-  
+echo "null = " & $toEntityId(0)

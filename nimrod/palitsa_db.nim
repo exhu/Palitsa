@@ -3,7 +3,7 @@ import db_sqlite
 import times
 import logging
 import os
-import parseutils
+import parseutils, strutils
 # ----
 import palitsa_sqlutils
 
@@ -13,19 +13,24 @@ type
     TEntityId* = distinct int64
     
 
-#proc `<` * (x, y: TEntityId): bool {.borrow.}
-#proc `<=` * (x, y: TEntityId): bool {.borrow.}
-#proc `==` * (x, y: TEntityId): bool {.borrow.}
-converter toInt64*(x: TEntityId): int64 = int64(x)
-converter toEntityId*(x: int64): TEntityId = TEntityId(x)
-
-
+proc `<` * (x, y: TEntityId): bool {.borrow.}
+proc `<=` * (x, y: TEntityId): bool {.borrow.}
+proc `==` * (x, y: TEntityId): bool {.borrow.}
+proc toInt64*(x: TEntityId): int64 = int64(x)
+proc toEntityId*(x: int64): TEntityId = TEntityId(x)
+ 
 const
     PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
     PALITSA_SCHEMA_VERSION_INT* = 103
-    NULL_ID* : TEntityId = 0'i64
+    NULL_ID* : TEntityId = toEntityId(0'i64)
     ## we treat zero ID as SQL NULL. 
     ## So zero ID is never used to identify existing row!
+
+
+proc `$`* (x: TEntityId): string =
+    if x == NULL_ID:
+        return "NULL"
+    return $toInt64(x)
 
 type
     EMultiTransaction* = object of EDB
@@ -106,11 +111,11 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
 proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     ## generate id via id_seq table
     var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?", $t)
-    var id: BiggestInt
+    var id: int64
     if nv.parseBiggestInt(id) == 0:
         raise newException(EDb, "Failed to generate id for " & $t)
     
-    result = id    
+    result = toEntityId(id)
     o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
     
   
@@ -129,8 +134,11 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
 
 proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64, 
     mTime: TTime, isDir: bool, parent: TEntityId): TEntityId =
-    # TODO
     
+    result = o.genIdFor(ptDirEntryDesc)
+ 
+    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
+        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, parent, path, name, fileSize, int64(mTime), int(isDir))
     
 
 # ------------
