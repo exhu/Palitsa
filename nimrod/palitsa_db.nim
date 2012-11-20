@@ -31,6 +31,17 @@ proc `$`* (x: TEntityId): string =
     if x == NULL_ID:
         return "NULL"
     return $toInt64(x)
+    
+    
+proc parseId(s: string): TEntityId =
+    var i: int64 = 0
+    if parseBiggestInt(s, i) > 0:
+        return toEntityId(i)
+    if s == "" or s == "NULL" or s == "null":
+        return NULL_ID
+    raise newException(EInvalidValue, "Failed parseId for " & s)
+    
+
 
 type
     EMultiTransaction* = object of EDB
@@ -115,6 +126,7 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
     o.inTransaction = false
 
 
+
 proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     ## generate id via id_seq table
     var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?", $t)
@@ -125,7 +137,28 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     result = toEntityId(id)
     o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
     
-  
+
+
+proc timeToSqlString*(t: TTime): string =
+    return $int64(t)
+
+
+proc timeFromSqlString*(s: string): TTime =
+    var i: int64
+    if parseBiggestInt(s, i) > 0:
+        return TTime(i)
+        
+    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
+ 
+    
+proc parseFileSize(s: string): int64 =
+    var i: int64
+    if parseBiggestInt(s, i) > 0:
+        return i
+    
+    raise newException(EInvalidValue, "failed parseFileSize for " & s)
+
+
 
 proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
     tuple[mediaId, rootId: TEntityId] =
@@ -133,10 +166,11 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     result.mediaId = o.genIdFor(ptMediaDesc)
     result.rootId = o.genIdFor(ptDirEntryDesc)
     o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, root_id) values(" &
-        "?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, path, int64(scanTime), result.rootId)
+        "?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, path, timeToSqlString(scanTime), result.rootId)
     
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
-        "values(?,NULL,'','/',0,?,1, NULL);"), $ptDirEntryDesc, result.rootId, int64(scanTime))
+        "values(?,NULL,'','/',0,?,1, NULL);"), $ptDirEntryDesc, result.rootId, timeToSqlString(scanTime))
+
 
 
 proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable.}=
@@ -148,7 +182,8 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
         e.path = ""
  
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
-        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, int64(e.mTime), int(e.isDir))
+        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, 
+        timeToSqlString(e.mTime), int(e.isDir))
     
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
@@ -158,12 +193,34 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
         outM.id = id
         outM.name = row[0]
         outM.originalPath = row[1]
-        var i: int64 = 0
-        discard parseBiggestInt(row[2], i)
-        outM.scanTime = TTime(i)
-        i = 0
-        discard parseBiggestInt(row[3], i)
-        outM.rootId = toEntityId(i)
+        outM.scanTime = timeFromSqlString(row[2])
+        outM.rootId = parseId(row[3])
+        return true
+        
+        
+        
+proc parseSqlBool(s: string): bool =
+    var i: int
+    if parseInt(s, i) > 0:
+        return bool(i)
+    
+    raise newException(EInvalidValue, "failed parseSqlBool for " & s)
+ 
+ 
+ 
+proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
+    result = false
+    var row = o.conn.getRow(sql"select name, dir_path, file_size, mtime, is_dir, parent_id, desc_id from ? where id = ?", $ptDirEntryDesc, id)
+    if row.len > 0:
+        outE.id = id
+        outE.name = row[0]
+        outE.path = row[1]
+        outE.fileSize = parseFileSize(row[2])
+        outE.mTime = timeFromSqlString(row[3])
+        outE.isDir = parseSqlBool(row[4])
+        outE.parentId = parseId(row[5])
+        outE.descId = parseId(row[6])
+        
         return true
 # ------------
 

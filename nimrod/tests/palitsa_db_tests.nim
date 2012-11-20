@@ -39,8 +39,11 @@ suite "db open suite":
             var id = myDb.genIdFor(ptMediaDesc)
             check BiggestInt(id) == BiggestInt(idBeforeFail)
 
-    test "createMedia and entry":
-        var mediaId: TEntityId
+    test "createMedia, entry, findMedia":
+        var 
+            mediaId, entId: TEntityId
+            
+            
         inTransaction(myDb):
             var t: TTime
             var m = myDb.createMedia("name", "path", t)
@@ -51,12 +54,18 @@ suite "db open suite":
             e.parentId = m.rootId
             e.name = "test file"
             echo "entry id = " & $myDb.createEntry(e)
+            entId = e.id
             
         var me: TMediaDesc
         var res = findMedia(myDb, mediaId, me)
         check res == true
         check me.name == "name"
         echo "original path = " & me.originalPath
+        
+        var dire: TDirEntryDesc
+        res = findEntry(myDb, entId, dire)
+        check res == true
+        check dire.name == "test file"
             
         
     test "time storage":
@@ -64,10 +73,8 @@ suite "db open suite":
 
         var t = GetTime()
         echo "template time = " & $t
-        var s = $int64(t)
-        var i: int64
-        discard parseBiggestInt(s, i)
-        t = TTime(i)
+        var s = timeToSqlString(t)
+        t = timeFromSqlString(s)
         echo "encoded/decoded time = " & $t
         
             
