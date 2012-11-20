@@ -1,6 +1,6 @@
 import times, parseutils, unittest
 
-import palitsa_db
+import palitsa_sqlutils, palitsa_db
 
 suite "db open suite":
     var myDb: TOpenDb

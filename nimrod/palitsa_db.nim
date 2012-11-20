@@ -8,47 +8,13 @@ import parseutils, strutils
 import palitsa_sqlutils
 
 
-
-type
-    TEntityId* = distinct int64
-    
-
-proc `<` * (x, y: TEntityId): bool {.borrow.}
-proc `<=` * (x, y: TEntityId): bool {.borrow.}
-proc `==` * (x, y: TEntityId): bool {.borrow.}
-proc toInt64*(x: TEntityId): int64 = int64(x)
-proc toEntityId*(x: int64): TEntityId = TEntityId(x)
  
 const
     PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
-    PALITSA_SCHEMA_VERSION_INT* = 103
-    NULL_ID* : TEntityId = toEntityId(0'i64)
-    ## we treat zero ID as SQL NULL. 
-    ## So zero ID is never used to identify existing row!
-
-
-proc `$`* (x: TEntityId): string =
-    if x == NULL_ID:
-        return "NULL"
-    return $toInt64(x)
-    
-    
-proc parseId(s: string): TEntityId =
-    var i: int64 = 0
-    if parseBiggestInt(s, i) > 0:
-        return toEntityId(i)
-    if s == "" or s == "NULL" or s == "null":
-        return NULL_ID
-    raise newException(EInvalidValue, "Failed parseId for " & s)
-    
+    PALITSA_SCHEMA_VERSION_INT* = 103    
 
 
 type
-    EMultiTransaction* = object of EDB
-
-    TOpenDb* = object
-        conn: TDbConn
-        inTransaction: bool
         
     TPalTable* = enum
         ptMediaDesc = "media_desc",
@@ -75,24 +41,6 @@ type
         rootId*: TEntityId
 
 
-proc beginTransaction*(o: var TOpenDb)
-proc endTransaction*(o: var TOpenDb, rollback: bool = false)
-
-template InTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
-    o.beginTransaction
-    try:
-      stmts
-      o.endTransaction(rollback)
-    except:
-      o.endTransaction(true)
-      raise
-
-
-template InTransaction*(o: var TOpenDb, stmts: stmt) =
-    InTransaction(o, rollback = false):
-        stmts
-
-
 
 proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =  
     if recreate:
@@ -110,21 +58,6 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
 proc closeDb*(o: var TOpenDb) =    
     o.conn.close()
 
-proc beginTransaction*(o: var TOpenDb) =
-    if o.inTransaction:
-        raise newException(EMultiTransaction, "already in transaction!")
-        
-    o.conn.exec sql"begin transaction;"
-    o.inTransaction = true
-
-proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
-    if not rollbacK:
-        o.conn.exec sql"commit;"
-    else:
-        o.conn.exec sql"rollback;"
-        
-    o.inTransaction = false
-
 
 
 proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
@@ -139,24 +72,12 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     
 
 
-proc timeToSqlString*(t: TTime): string =
-    return $int64(t)
-
-
-proc timeFromSqlString*(s: string): TTime =
-    var i: int64
-    if parseBiggestInt(s, i) > 0:
-        return TTime(i)
-        
-    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
- 
     
 proc parseFileSize(s: string): int64 =
-    var i: int64
-    if parseBiggestInt(s, i) > 0:
-        return i
-    
-    raise newException(EInvalidValue, "failed parseFileSize for " & s)
+    try:
+        result = parseInt64(s)
+    except:
+        raise newException(EInvalidValue, "failed parseFileSize for " & s)
 
 
 
@@ -183,7 +104,7 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
  
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
         "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, 
-        timeToSqlString(e.mTime), int(e.isDir))
+        timeToSqlString(e.mTime), boolToSql(e.isDir))
     
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
@@ -198,15 +119,7 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
         return true
         
         
-        
-proc parseSqlBool(s: string): bool =
-    var i: int
-    if parseInt(s, i) > 0:
-        return bool(i)
-    
-    raise newException(EInvalidValue, "failed parseSqlBool for " & s)
- 
- 
+         
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     result = false

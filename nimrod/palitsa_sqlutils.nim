@@ -1,8 +1,134 @@
-import strutils
+import db_sqlite, strutils, parseutils, times
 
+type
+    TEntityId* = distinct int64
+        ## table entry id holder, 0 = SQL NULL.
+        ## use provided $, toInt64, toEntityId, parseId procs -- they
+        ## convert to SQL string, int64, and vice versa.
+    
+    EMultiTransaction* = object of EDB
+        ## begin transaction within already running transaction error.
+
+    TOpenDb* = object
+        ## use DB via this structure
+        conn*: TDbConn
+        inTransaction: bool
+
+proc `<` * (x, y: TEntityId): bool {.borrow.}
+proc `<=` * (x, y: TEntityId): bool {.borrow.}
+proc `==` * (x, y: TEntityId): bool {.borrow.}
+proc toInt64*(x: TEntityId): int64 = int64(x)
+proc toEntityId*(x: int64): TEntityId = TEntityId(x)
+
+const
+    NULL_ID* : TEntityId = toEntityId(0'i64)
+    ## we treat zero ID as SQL NULL. 
+    ## So zero ID is never used to identify an existing row!
+
+proc `$`* (x: TEntityId): string =
+    ## converts 0 to "NULL"
+    if x == NULL_ID:
+        return "NULL"
+    return $toInt64(x)
+    
+    
+proc parseId*(s: string): TEntityId =
+    ## converts empty, "NULL" etc strings to appropriate representation.
+    var i: int64 = 0
+    if parseBiggestInt(s, i) > 0:
+        return toEntityId(i)
+    if s == "" or s == "NULL" or s == "null":
+        return NULL_ID
+    raise newException(EInvalidValue, "Failed parseId for " & s)
+
+
+proc timeToSqlString*(t: TTime): string =
+    ## encodes time to SQL string/number, current implementation uses int64
+    return $int64(t)
+
+
+proc parseInt64*(s: string): int64 =
+    ## raises exception if can't parse
+    var i: int64
+    if parseBiggestInt(s, i) > 0:
+        return i
+    
+    raise newException(EInvalidValue, "failed parseInt64 for " & s)
+
+
+proc boolToSql*(b: bool): string =
+    ## stores bool as 0 or 1 integer
+    if b == false:
+        return "0"
+    return "1"
+
+
+proc parseSqlBool*(s: string): bool =
+    ## parses bool from integer string
+    var i: int
+    if parseInt(s, i) > 0:
+        return i != 0
+    
+    raise newException(EInvalidValue, "failed parseSqlBool for " & s)
+ 
+
+
+proc timeFromSqlString*(s: string): TTime =
+    ## decodes time from SQL result string/number, current implementation uses int64
+    var i: int64
+    if parseBiggestInt(s, i) > 0:
+        return TTime(i)
+        
+    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
+ 
+
+
+proc beginTransaction*(o: var TOpenDb)
+proc endTransaction*(o: var TOpenDb, rollback: bool = false)
+
+template InTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
+    ## rollbacks on exception and reraises error.
+    ## you can force rollback by rollback = true, e.g. for testing
+    o.beginTransaction
+    try:
+      stmts
+      o.endTransaction(rollback)
+    except:
+      o.endTransaction(true)
+      raise
+
+
+template InTransaction*(o: var TOpenDb, stmts: stmt) =
+    ## rollbacks on exception and reraises error, commits on success.
+    InTransaction(o, rollback = false):
+        stmts
+
+
+
+proc beginTransaction*(o: var TOpenDb) =
+    if o.inTransaction:
+        raise newException(EMultiTransaction, "already in transaction!")
+        
+    o.conn.exec sql"begin transaction;"
+    o.inTransaction = true
+
+
+
+proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
+    if not rollbacK:
+        o.conn.exec sql"commit;"
+    else:
+        o.conn.exec sql"rollback;"
+        
+    o.inTransaction = false
+
+
+
+# ---------- sql parsing -------
 
 type
     TStatements* = seq[string]
+        ## sql complete statements for execution one by one.
 
     RSqlParser = ref object
         statements : TStatements
@@ -42,16 +168,17 @@ proc parseLine(p : RSQLParser, s: string) =
     
         
 proc ParseSqlFile*(fn : string) : TStatements =
-  var p : RSqlParser
-  new(p)
-  p.curStatement = ""
-  p.statements = @[]
-  var f = open(fn)
-  var line: string = ""
-  while f.readLine(line):
-    p.parseLine(line)
-  close(f)
-  return p.statements
+    ## reads sql script and splits it into statements
+    var p : RSqlParser
+    new(p)
+    p.curStatement = ""
+    p.statements = @[]
+    var f = open(fn)
+    var line: string = ""
+    while f.readLine(line):
+        p.parseLine(line)
+    close(f)
+    return p.statements
      
 # ------------------
         
