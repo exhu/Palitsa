@@ -46,15 +46,22 @@ type
         ptTagDesc = "tag_desc",
         ptTagDirEntryAssoc = "tag_dir_entry_assoc"
 
-    TDirEntryDesc = object
-        id: TEntityId
-        name, path: string
-        fileSize: int64
-        mTime: TTime
-        isDir: bool
-        parent: TEntityId
-        descId: TEntityId
 
+    TDirEntryDesc* = object
+        id*: TEntityId
+        name*, path*: string
+        fileSize*: int64
+        mTime*: TTime
+        isDir*: bool
+        parentId*: TEntityId
+        descId*: TEntityId
+
+    TMediaDesc* = object
+        id*: TEntityId
+        name*: string
+        originalPath*: string
+        scanTime*: TTime
+        rootId*: TEntityId
 
 
 proc beginTransaction*(o: var TOpenDb)
@@ -132,13 +139,16 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
         "values(?,NULL,'','/',0,?,1, NULL);"), $ptDirEntryDesc, result.rootId, int64(scanTime))
 
 
-proc createEntry*(o: var TOpenDb, name, path: string, fileSize: int64, 
-    mTime: TTime, isDir: bool, parent: TEntityId): TEntityId =
-    
+proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable.}=
+    ## Creates directory entry and updates id field. Returns this id field.
     result = o.genIdFor(ptDirEntryDesc)
+    e.id = result
+ 
+    if e.path == nil:
+        e.path = ""
  
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
-        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, parent, path, name, fileSize, int64(mTime), int(isDir))
+        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, int64(e.mTime), int(e.isDir))
     
 
 # ------------

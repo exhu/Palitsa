@@ -28,11 +28,16 @@ suite "db open suite":
             var id = myDb.genIdFor(ptMediaDesc)
             check BiggestInt(id) == BiggestInt(idBeforeFail)
 
-    test "createMedia":
+    test "createMedia and entry":
         inTransaction(myDb):
             var t: TTime
             var m = myDb.createMedia("name", "path", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
+            
+            var e: TDirEntryDesc
+            e.parentId = m.rootId
+            e.name = "test file"
+            echo "entry id = " & $myDb.createEntry(e)
 
     test "double transaction fail":
         myDb.beginTransaction
