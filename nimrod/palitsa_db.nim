@@ -151,6 +151,20 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
         "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, int64(e.mTime), int(e.isDir))
     
 
+proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
+    result = false
+    var row = o.conn.getRow(sql"select name, original_path, scan_time, root_id from ? where id = ?", $ptMediaDesc, id)
+    if row.len > 0:
+        outM.id = id
+        outM.name = row[0]
+        outM.originalPath = row[1]
+        var i: int64 = 0
+        discard parseBiggestInt(row[2], i)
+        outM.scanTime = TTime(i)
+        i = 0
+        discard parseBiggestInt(row[3], i)
+        outM.rootId = toEntityId(i)
+        return true
 # ------------
 
 

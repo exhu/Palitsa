@@ -1,6 +1,6 @@
-import times
+import times, parseutils, unittest
 
-import palitsa_db, unittest
+import palitsa_db
 
 suite "db open suite":
     var myDb: TOpenDb
@@ -12,7 +12,18 @@ suite "db open suite":
     teardown:
         echo "suite teardown"
         myDb.closeDb()
-    
+
+    test "double transaction fail":
+        myDb.beginTransaction
+        try:
+            myDb.beginTransaction
+        except EMultiTransaction:
+            nil
+        
+        finally:
+            myDb.endTransaction(rollback = true)
+
+
     test "genId":
         inTransaction(myDb):
             var id1 = myDb.genIdFor(ptMediaDesc)
@@ -29,25 +40,36 @@ suite "db open suite":
             check BiggestInt(id) == BiggestInt(idBeforeFail)
 
     test "createMedia and entry":
+        var mediaId: TEntityId
         inTransaction(myDb):
             var t: TTime
             var m = myDb.createMedia("name", "path", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
+            mediaId = m.mediaId
             
             var e: TDirEntryDesc
             e.parentId = m.rootId
             e.name = "test file"
             echo "entry id = " & $myDb.createEntry(e)
-
-    test "double transaction fail":
-        myDb.beginTransaction
-        try:
-            myDb.beginTransaction
-        except EMultiTransaction:
-            nil
+            
+        var me: TMediaDesc
+        var res = findMedia(myDb, mediaId, me)
+        check res == true
+        check me.name == "name"
+        echo "original path = " & me.originalPath
+            
         
-        finally:
-            myDb.endTransaction(rollback = true)
+    test "time storage":
+        # TTime <> int64 test
+
+        var t = GetTime()
+        echo "template time = " & $t
+        var s = $int64(t)
+        var i: int64
+        discard parseBiggestInt(s, i)
+        t = TTime(i)
+        echo "encoded/decoded time = " & $t
+        
             
 
 echo "null = " & $toEntityId(0)
