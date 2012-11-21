@@ -1,3 +1,5 @@
+## sqlite3 dependent db utils
+
 import db_sqlite, strutils, parseutils, times
 
 type
