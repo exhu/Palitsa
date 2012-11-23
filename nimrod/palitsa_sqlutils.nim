@@ -1,12 +1,18 @@
 ## sqlite3 dependent db utils
 
 import db_sqlite, strutils, parseutils, times
+import typeinfo
 
 type
     TEntityId* = distinct int64
         ## table entry id holder, 0 = SQL NULL.
         ## use provided $, toInt64, toEntityId, parseId procs -- they
         ## convert to SQL string, int64, and vice versa.
+    
+    TDbEntity = object of TObject
+        ## represents a db table in native types
+        id: TEntityId
+        
     
     EMultiTransaction* = object of EDB
         ## begin transaction within already running transaction error.
@@ -181,7 +187,20 @@ proc ParseSqlFile*(fn : string) : TStatements =
         p.parseLine(line)
     close(f)
     return p.statements
-     
+ 
+ # -----
+ 
+# TODO implement simple find/create/delete/update procs based on typeinfo
+# for plain data objects, raise exception if field type is object etc.
+# special case for id field, boolean type etc.
+
+iterator treeFields(obj: TAny): tuple[name: string, any: TAny] =
+    nil
+
+proc insertObject*(o: var TOpenDb, obj: TAny) =
+    nil
+ 
+ 
 # ------------------
         
 when isMainModule:
