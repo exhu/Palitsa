@@ -195,8 +195,33 @@ proc ParseSqlFile*(fn : string) : TStatements =
 # for plain data objects, raise exception if field type is object etc.
 # special case for id field, boolean type etc.
 
-iterator treeFields(obj: TAny): tuple[name: string, any: TAny] =
-    nil
+#iterator treeFields(obj: TAny): tuple[name: string, any: TAny] =
+#    for k,v in fields(obj):
+#        yield (k,v)
+#    
+#    if obj.baseTypeKind == akObject:
+#        for k,v in treeFields(obj.base):
+#            yield k,v
+ 
+type 
+    TAKField = tuple[name: string, any: TAny]
+    
+
+proc forEveryField(o: TAny, p: proc(f: TAKField)) =
+    for n, a in o.fields:
+        p((n,a))
+        
+    if o.baseTypeKind == akObject:
+        forEveryField(o.base, p)
+
+
+proc getAllFields(o: TAny): seq[TAKField] =
+    var coll: seq[TAKField] = @[]
+    o.forEveryField proc(f:TAKField) =
+        coll.add f
+    return coll
+    
+    
 
 proc insertObject*(o: var TOpenDb, obj: TAny) =
     nil
@@ -205,10 +230,14 @@ proc insertObject*(o: var TOpenDb, obj: TAny) =
 # ------------------
         
 when isMainModule:
-  var st : TStatements
-
-  st = ParseSqlFile("db_schema1_sqlite.sql")
-
-  for s in items(st):
-    echo s
-  
+    # var st : TStatements 
+    # st = ParseSqlFile("db_schema1_sqlite.sql") 
+    # for s in items(st):
+    # echo s
+    type TMy = object of TDbEntity
+        nnn: string
+        
+    var t: TMy
+    var r = t.toAny.getAllFields
+    for i in items(r):
+        echo i.name
