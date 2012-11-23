@@ -62,13 +62,15 @@ proc closeDb*(o: var TOpenDb) =
 
 proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     ## generate id via id_seq table
-    var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?", $t)
+    var nv = o.conn.getValue(sql"select nextv from id_seq where table_name = ?",
+        $t)
     var id: int64
     if nv.parseBiggestInt(id) == 0:
         raise newException(EDb, "Failed to generate id for " & $t)
     
     result = toEntityId(id)
-    o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", $n, $t)
+    o.conn.exec(sql"update id_seq set nextv = nextv + ? where table_name = ?", 
+        $n, $t)
     
 
 
@@ -86,11 +88,13 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     # create media_desc, and root node
     result.mediaId = o.genIdFor(ptMediaDesc)
     result.rootId = o.genIdFor(ptDirEntryDesc)
-    o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, root_id) values(" &
-        "?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, path, timeToSqlString(scanTime), result.rootId)
+    o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, "&
+        "root_id) values(?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, 
+        path, timeToSqlString(scanTime), result.rootId)
     
-    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
-        "values(?,NULL,'','/',0,?,1, NULL);"), $ptDirEntryDesc, result.rootId, timeToSqlString(scanTime))
+    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
+        "file_size, mtime, is_dir, desc_id) values(?,NULL,'','/',0,?,1, NULL);"), 
+        $ptDirEntryDesc, result.rootId, timeToSqlString(scanTime))
 
 
 
@@ -102,14 +106,16 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
     if e.path == nil:
         e.path = ""
  
-    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, file_size, mtime, is_dir, desc_id) " &
-        "values(?,?,?,?,?,?,?,NULL);"), $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, 
+    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
+        "file_size, mtime, is_dir, desc_id) values(?,?,?,?,?,?,?,NULL);"), 
+        $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, 
         timeToSqlString(e.mTime), boolToSql(e.isDir))
     
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     result = false
-    var row = o.conn.getRow(sql"select name, original_path, scan_time, root_id from ? where id = ?", $ptMediaDesc, id)
+    var row = o.conn.getRow(TSqlQuery("select name, original_path, scan_time, "&
+        "root_id from ? where id = ?"), $ptMediaDesc, id)
     if row.len > 0:
         outM.id = id
         outM.name = row[0]
@@ -123,7 +129,8 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     result = false
-    var row = o.conn.getRow(sql"select name, dir_path, file_size, mtime, is_dir, parent_id, desc_id from ? where id = ?", $ptDirEntryDesc, id)
+    var row = o.conn.getRow(TSQLQuery("select name, dir_path, file_size, mtime,"&
+        " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, id)
     if row.len > 0:
         outE.id = id
         outE.name = row[0]

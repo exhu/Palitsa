@@ -82,7 +82,8 @@ proc parseSqlBool*(s: string): bool =
 
 
 proc timeFromSqlString*(s: string): TTime =
-    ## decodes time from SQL result string/number, current implementation uses int64
+    ## decodes time from SQL result string/number, current implementation uses 
+    ## int64
     var i: int64
     if parseBiggestInt(s, i) > 0:
         return TTime(i)
@@ -188,7 +189,7 @@ proc ParseSqlFile*(fn : string) : TStatements =
     close(f)
     return p.statements
  
- # -----
+# -----
  
 # TODO implement simple find/create/delete/update procs based on typeinfo
 # for plain data objects, raise exception if field type is object etc.
