@@ -236,18 +236,22 @@ proc readObject*(o: var TOpenDb, tabName: string, obj: TAny): bool =
     var 
         fields = getAllFields(obj)
         id: TEntityId = NULL_ID
-        fieldsStr = ""
+        fieldsStr: seq[string] = @[]
+        
         
     for f in fields:
         if f.name == "id":
             assert(f.any.size == TEntityId.sizeof)
             id = toEntityId(f.any.getInt64())
         
-        fieldsStr &= ", " & $f.name
+        fieldsStr.add($f.name)
             
-    # select queryStr from tabName where id = $id 
-    var row = o.conn.getRow(TSqlQuery("select " & fieldsStr & " from ? where id = ?"),
-        tabName, id)
+    # select queryStr from tabName where id = $id
+    var fieldsQ = repeatStr(fields.len, "?,")
+    # cut last ','
+    fieldsQ.setLen(fieldsQ.len-1)
+    var row = o.conn.getRow(TSqlQuery("select " & fieldsQ & " from ? where id = ?"),
+        fieldsStr & @[tabName, $id])
     
     # fill obj fields from row, not all types are supported
     block:
@@ -277,11 +281,40 @@ proc readObject*(o: var TOpenDb, tabName: string, obj: TAny): bool =
     return false
     
 
-proc insertObject*(o: var TOpenDb, tabName: string, obj: TAny) =
-    nil
+proc insertObject*(o: var TOpenDb, tabName: string, obj: TAny, entityFields: openArray[string]) =
+    ## id field must be valid! entityFields = list of field names which are of type TEntityId
+    ## for correct NULL value handling.
+    var 
+        fields = getAllFields(obj)
+        fieldsStr: seq[string] = @[]
+        valuesStr: seq[string] = @[]
+    
+    
+    for f in fields:
+        fieldsStr.add(f.name)
+        if entityFields.contains(f.name) or f.name == "id":
+            valuesStr.add($toEntityId(f.any.getBiggestInt()))
+        else:
+            var s: string
+            case f.any.kind
+            of akInt32, akInt64:
+                s = $f.any.getBiggestInt()
+            of akString:
+                s = f.any.getString()
+            of akBool:
+                s = boolToSql(f.any.getBool())
+            else:
+                raise newException(EInvalidValue, "no support for " & $f.any.kind)
+            
+            valuesStr.add(s)
+        
+    # TODO    
+    #"insert into ? (" & fieldsStr & ") values (" & 
 
-proc updateObject*(o: var TOpenDb, tabName: string, obj: TAny) =
+proc updateObject*(o: var TOpenDb, tabName: string, obj: TAny, entityFields: openArray[string]) =
     nil
+    # TODO
+    # update ? set ? = ?, ... where id = ?
 
  
 # ------------------
