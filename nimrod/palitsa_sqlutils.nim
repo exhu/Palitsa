@@ -222,10 +222,67 @@ proc getAllFields(o: TAny): seq[TAKField] =
     return coll
     
     
+proc parseInt32(s: string): int32 =
+    var i: BiggestInt = 0
+    discard parseBiggestInt(s, i)
+    if i >= low(int32) and i <= high(int32):
+        return int32(i)
+    raise newException(EInvalidValue, s & " is beyond int32 range")
+    
 
-proc insertObject*(o: var TOpenDb, obj: TAny) =
+proc readObject*(o: var TOpenDb, tabName: string, obj: TAny): bool =
+    ## gets id field, reads it value and looks for this object in
+    ## the specified table. returns true on success
+    var 
+        fields = getAllFields(obj)
+        id: TEntityId = NULL_ID
+        fieldsStr = ""
+        
+    for f in fields:
+        if f.name == "id":
+            assert(f.any.size == TEntityId.sizeof)
+            id = toEntityId(f.any.getInt64())
+        
+        fieldsStr &= ", " & $f.name
+            
+    # select queryStr from tabName where id = $id 
+    var row = o.conn.getRow(TSqlQuery("select " & fieldsStr & " from ? where id = ?"),
+        tabName, id)
+    
+    # fill obj fields from row, not all types are supported
+    block:
+        var fIndex: int = 0
+        for r in row:
+            var f = fields[fIndex]
+            inc fIndex
+            
+            case f.any.kind
+            of akInt32:
+                f.any.setBiggestInt(parseInt32(r))
+                
+            of akInt64:
+                if r == "":
+                    f.any.setBiggestInt(0)
+                else:
+                    f.any.setBiggestInt(parseInt64(r))
+                    
+            of akBool:
+                f.any.setBiggestInt(int(parseSqlBool(r)))
+                
+            of akString:
+                f.any.setString(r)
+            else:
+                raise newException(EInvalidValue, "can't parse field " & f.name & " of type " & $f.any.kind)
+                
+    return false
+    
+
+proc insertObject*(o: var TOpenDb, tabName: string, obj: TAny) =
     nil
- 
+
+proc updateObject*(o: var TOpenDb, tabName: string, obj: TAny) =
+    nil
+
  
 # ------------------
         
