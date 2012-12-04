@@ -308,12 +308,16 @@ proc insertObject*(o: var TOpenDb, tabName: string, obj: TAny, entityFields: ope
             
             valuesStr.add(s)
         
-    # TODO    
     #"insert into ? (" & fieldsStr & ") values (" & 
+    var fieldsQ = repeatStr(fields.len, "?,")
+    # cut out last ','
+    fieldsQ.setLen(fieldsQ.len-1)
+    o.conn.exec(sql("insert into ? (" & fieldsQ & ") values (" & fieldsQ & ");"),
+        fieldsStr & valuesStr)
 
 proc updateObject*(o: var TOpenDb, tabName: string, obj: TAny, entityFields: openArray[string]) =
     nil
-    # TODO
+    # TODO reuse code from insertObject,
     # update ? set ? = ?, ... where id = ?
 
  
