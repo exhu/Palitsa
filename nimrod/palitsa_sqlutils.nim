@@ -14,12 +14,12 @@ type
         id: TEntityId
 
 
-    RFieldMapping* = ref object
+    PFieldCoder* = ref object
         ## serialize-like functions, converts from sql and to sql text
-        toString: proc (a: var TAny): string
-        fromString: proc (a: var TAny, s: string)
+        toString: proc (a: TAny): string {.closure.}
+        fromString: proc (a: var TAny, s: string) {.closure.}
 
-    TEntityMapping* = TTable[string, RFieldMapping]
+    TEntityMapping* = TTable[string, PFieldCoder]
         ## maps field names to serialize methods
         ## id field is not specified here. Pass this map to readObject etc.
         ## functions.
@@ -103,22 +103,47 @@ proc timeFromSqlString*(s: string): TTime =
 
 # -------
 
-proc DefaultEntityMapping(): RFieldMapping =
-    var m: RFieldMapping
-    new(m)
-    m.toString = proc(a: var TAny): string =
+proc newFieldCoder*(o: var PFieldCoder, toString: proc(a: TAny): string {.closure.},
+    fromString: proc(a: var TAny, s: string) {.closure.}) =
+    o.new
+    o.toString = toString
+    o.fromString = fromString
+
+
+var defEntCoder: PFieldCoder = nil
+
+proc DefaultEntityIdCoder*(): PFieldCoder =
+    if defEntCoder != nil:
+        return defEntCoder
+        
+    defEntCoder.new
+    defEntCoder.toString = proc(a: TAny): string =
         assert(a.size == TEntityId.sizeof)
         return $toEntityId(a.getInt64())
         
-    m.fromString = proc(a: var TAny, s: string) =
+    defEntCoder.fromString = proc(a: var TAny, s: string)=
         assert(a.size == TEntityId.sizeof)
         var id = parseId(s)
         a.setBiggestInt(toInt64(id))
         return
     
-    
-proc DefaultTimeMapping(): RFieldMapping =
-    nil
+
+var defTimeCoder: PFieldCoder = nil
+
+proc DefaultTimeCoder*(): PFieldCoder =
+    if defTimeCoder != nil:
+        return defTimeCoder
+        
+    defTimeCoder.new
+    defTimeCoder.toString = proc(a: TAny): string =
+        assert(a.size == TTime.sizeof)
+        return timeToSqlString(TTime(a.getBiggestInt()))
+        
+    defTimeCoder.fromString = proc(a: var TAny, s: string)=
+        assert(a.size == TTime.sizeof)
+        var t = parseInt64(s)
+        a.setBiggestInt(t)
+        return
 
 # ------------
 
