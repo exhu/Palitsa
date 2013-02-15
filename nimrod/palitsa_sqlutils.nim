@@ -1,5 +1,7 @@
 ## sqlite3 dependent db utils
 
+## use toSqlVal/fromSqlVal in your requests
+
 import db_sqlite, strutils, parseutils, times
 import typeinfo, tables
 
@@ -40,7 +42,7 @@ proc `$`* (x: TEntityId): string =
     return $toInt64(x)
 
 
-proc parseId*(s: string): TEntityId =
+proc parseId(s: string): TEntityId =
     ## converts empty, "NULL" etc strings to appropriate representation.
     var i: int64 = 0
     if parseBiggestInt(s, i) > 0:
@@ -50,12 +52,33 @@ proc parseId*(s: string): TEntityId =
     raise newException(EInvalidValue, "Failed parseId for " & s)
 
 
-proc timeToSqlString*(t: TTime): string =
+proc toSqlVal*(e: TEntityId) = $e
+proc fromSqlVal*(e: var TEntityId, s: string) = 
+    e = parseId(s)
+
+
+proc timeToSqlString(t: TTime): string =
     ## encodes time to SQL string/number, current implementation uses int64
     return $int64(t)
 
+proc timeFromSqlString(s: string): TTime =
+    ## decodes time from SQL result string/number, current implementation uses
+    ## int64
+    var i: int64
+    if parseBiggestInt(s, i) > 0:
+        return TTime(i)
 
-proc parseInt64*(s: string): int64 =
+    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
+
+
+
+proc toSqlVal*(t: TTime): string = timeToSqlString(t)
+proc fromSqlVal*(t: var TTime, s: string) =
+    t = timeFromSqlString(s)
+
+
+
+proc parseInt64(s: string): int64 =
     ## raises exception if can't parse
     var i: int64
     if parseBiggestInt(s, i) > 0:
@@ -64,14 +87,29 @@ proc parseInt64*(s: string): int64 =
     raise newException(EInvalidValue, "failed parseInt64 for " & s)
 
 
-proc boolToSql*(b: bool): string =
+proc toSqlVal*(i: int64): string = $i
+proc toSqlVal*(i: int): string = $i
+proc toSqlVal*(i: int32): string = $i
+
+proc fromSqlVal*(i: var int64, s: string) = 
+    i = parseInt64(s)
+
+proc fromSqlVal*(i: var int32, s: string) = 
+    i = parseInt64(s)
+
+proc fromSqlVal*(i: var int, s: string) = 
+    i = parseInt64(s)
+
+
+
+proc boolToSql(b: bool): string =
     ## stores bool as 0 or 1 integer
     if b == false:
         return "0"
     return "1"
 
 
-proc parseSqlBool*(s: string): bool =
+proc parseSqlBool(s: string): bool =
     ## parses bool from integer string
     var i: int
     if parseInt(s, i) > 0:
@@ -81,14 +119,10 @@ proc parseSqlBool*(s: string): bool =
 
 
 
-proc timeFromSqlString*(s: string): TTime =
-    ## decodes time from SQL result string/number, current implementation uses
-    ## int64
-    var i: int64
-    if parseBiggestInt(s, i) > 0:
-        return TTime(i)
+proc toSqlVal*(b: bool): string = boolToSql(b)
+proc fromSqlVal*(b: var bool, s: string) = 
+    b = parseSqlBool(s)
 
-    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
 
 
 # -------
