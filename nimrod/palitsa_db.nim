@@ -25,6 +25,7 @@ type
 
 
     TDirEntryDesc* = object
+        ## used for inserting new entries and querrying
         id*: TEntityId
         name*, path*: string
         fileSize*: int64
@@ -34,6 +35,7 @@ type
         descId*: TEntityId
 
     TMediaDesc* = object
+        ## used for inserting new entries and querrying
         id*: TEntityId
         name*: string
         originalPath*: string
