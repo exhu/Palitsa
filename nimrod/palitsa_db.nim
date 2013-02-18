@@ -24,23 +24,23 @@ type
         ptTagDirEntryAssoc = "tag_dir_entry_assoc"
 
 
-    TDirEntryDesc* = object
+    TDirEntryDesc* = tuple
         ## used for inserting new entries and querrying
-        id*: TEntityId
-        name*, path*: string
-        fileSize*: int64
-        mTime*: TTime
-        isDir*: bool
-        parentId*: TEntityId
-        descId*: TEntityId
+        id: TEntityId
+        name, path: string
+        fileSize: int64
+        mTime: TTime
+        isDir: bool
+        parentId: TEntityId
+        descId: TEntityId
 
-    TMediaDesc* = object
+    TMediaDesc* = tuple
         ## used for inserting new entries and querrying
-        id*: TEntityId
-        name*: string
-        originalPath*: string
-        scanTime*: TTime
-        rootId*: TEntityId
+        id: TEntityId
+        name: string
+        originalPath: string
+        scanTime: TTime
+        rootId: TEntityId
 
 
 
@@ -54,6 +54,7 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
             for i in script:
                 #echo "executing '" & i & "'..."
                 db_sqlite.exec o.conn, TSqlQuery(i)
+    # todo check for proper version number
             
     
     
@@ -77,11 +78,11 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
 
 
     
-proc parseFileSize(s: string): int64 =
-    try:
-        result = parseInt64(s)
-    except:
-        raise newException(EInvalidValue, "failed parseFileSize for " & s)
+#proc parseFileSize(s: string): int64 =
+#    try:
+#        result = parseInt64(s)
+#    except:
+#        raise newException(EInvalidValue, "failed parseFileSize for " & s)
 
 
 
@@ -91,12 +92,16 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     result.mediaId = o.genIdFor(ptMediaDesc)
     result.rootId = o.genIdFor(ptDirEntryDesc)
     o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, "&
-        "root_id) values(?,?,?,?,?);"), $ptMediaDesc, result.mediaId, name, 
-        path, timeToSqlString(scanTime), result.rootId)
+        "root_id) values(?,?,?,?,?);"), $ptMediaDesc, result.mediaId.toSqlVal, 
+        name.toSqlVal, 
+        path.toSqlVal, 
+        scanTime.toSqlVAL, result.rootId.toSqlVal)
+    
+    
     
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
         "file_size, mtime, is_dir, desc_id) values(?,NULL,'','/',0,?,1, NULL);"), 
-        $ptDirEntryDesc, result.rootId, timeToSqlString(scanTime))
+        $ptDirEntryDesc, result.rootId.toSqlVal, scanTime.toSqlVal)
 
 
 
@@ -104,14 +109,27 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
     ## Creates directory entry and updates id field. Returns this id field.
     result = o.genIdFor(ptDirEntryDesc)
     e.id = result
+    e.descId = NULL_ID    
  
     if e.path == nil:
         e.path = ""
  
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
         "file_size, mtime, is_dir, desc_id) values(?,?,?,?,?,?,?,NULL);"), 
-        $ptDirEntryDesc, result, e.parentId, e.path, e.name, e.fileSize, 
-        timeToSqlString(e.mTime), boolToSql(e.isDir))
+        $ptDirEntryDesc, result.toSqlVal, e.parentId.toSqlVal, 
+        e.path.toSqlVal, e.name.toSqlVal, e.fileSize.toSqlVal, 
+        e.mTime.toSqlVal, e.isDir.toSqlVal)
+    
+
+proc entityFieldsFromRow[TT](t: var TT, row: seq[string]) =
+    var r = 0    
+    for k,v in fieldPairs(t):
+        # skip id field, it's not in result
+        if k != "id":            
+            v.fromSqlVal(row[r])
+            r.inc
+        
+    assert(r == row.len)
     
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
@@ -120,10 +138,13 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
         "root_id from ? where id = ?"), $ptMediaDesc, id)
     if row.len > 0:
         outM.id = id
-        outM.name = row[0]
-        outM.originalPath = row[1]
-        outM.scanTime = timeFromSqlString(row[2])
-        outM.rootId = parseId(row[3])
+        
+        outM.entityFieldsFromRow(row)        
+        
+        #outM.name.fromSqlVal(row[0])
+        #outM.originalPath.fromSqlVal(row[1])
+        #outM.scanTime.fromSqlVal(row[2])
+        #outM.rootId.fromSqlVal(row[3])
         return true
         
         
@@ -134,14 +155,16 @@ proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     var row = o.conn.getRow(TSQLQuery("select name, dir_path, file_size, mtime,"&
         " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, id)
     if row.len > 0:
-        outE.id = id
-        outE.name = row[0]
-        outE.path = row[1]
-        outE.fileSize = parseFileSize(row[2])
-        outE.mTime = timeFromSqlString(row[3])
-        outE.isDir = parseSqlBool(row[4])
-        outE.parentId = parseId(row[5])
-        outE.descId = parseId(row[6])
+        outE.id = id        
+        outE.entityFieldsFromRow(row)
+                
+        #outE.name = row[0]
+        #outE.path = row[1]
+        #outE.fileSize = parseFileSize(row[2])
+        #outE.mTime = timeFromSqlString(row[3])
+        #outE.isDir = parseSqlBool(row[4])
+        #outE.parentId = parseId(row[5])
+        #outE.descId = parseId(row[6])
         
         return true
 # ------------

@@ -55,7 +55,8 @@ suite "db open suite":
             e.name = "test file"
             echo "entry id = " & $myDb.createEntry(e)
             entId = e.id
-            
+        
+        
         var me: TMediaDesc
         var res = findMedia(myDb, mediaId, me)
         check res == true
@@ -63,9 +64,13 @@ suite "db open suite":
         echo "original path = " & me.originalPath
         
         var dire: TDirEntryDesc
+        echo "find entry..."
         res = findEntry(myDb, entId, dire)
+        echo "fount entry..."
         check res == true
+        assert(not dire.name.isNil)
         check dire.name == "test file"
+        
             
         
     test "time storage":
@@ -73,8 +78,8 @@ suite "db open suite":
 
         var t = GetTime()
         echo "template time = " & $t
-        var s = timeToSqlString(t)
-        t = timeFromSqlString(s)
+        var s = t.toSqlVal
+        t.fromSqlVal(s)
         echo "encoded/decoded time = " & $t
         
             

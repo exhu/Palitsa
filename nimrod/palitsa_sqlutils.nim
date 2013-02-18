@@ -52,7 +52,11 @@ proc parseId(s: string): TEntityId =
     raise newException(EInvalidValue, "Failed parseId for " & s)
 
 
-proc toSqlVal*(e: TEntityId) = $e
+proc toSqlVal*(e: string): string = e
+proc fromSqlVal*(e: var string, s: string) = 
+    e = s
+
+proc toSqlVal*(e: TEntityId): string = return $e
 proc fromSqlVal*(e: var TEntityId, s: string) = 
     e = parseId(s)
 
@@ -94,11 +98,19 @@ proc toSqlVal*(i: int32): string = $i
 proc fromSqlVal*(i: var int64, s: string) = 
     i = parseInt64(s)
 
-proc fromSqlVal*(i: var int32, s: string) = 
-    i = parseInt64(s)
+proc fromSqlVal*(i: var int32, s: string) =
+    var ip = parseInt64(s)
+    if (ip < int32.low) or (ip > int32.high):
+        raise newException(EOverflow, "fromSqlVal int32 overflow")
+    else:
+        i = int32(ip)
 
 proc fromSqlVal*(i: var int, s: string) = 
-    i = parseInt64(s)
+    var ip = parseInt64(s)
+    if (ip < int.low) or (ip > int.high):
+        raise newException(EOverflow, "fromSqlVal int overflow")
+    else:
+        i = int(ip)
 
 
 
