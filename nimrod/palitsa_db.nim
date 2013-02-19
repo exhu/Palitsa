@@ -11,21 +11,23 @@ import palitsa_sqlutils
  
 const
     PALITSA_SCHEMA_FILE* = "db_schema1_sqlite.sql"
-    PALITSA_SCHEMA_VERSION_INT* = 103    
+    PALITSA_SCHEMA_VERSION_INT* = 103
 
 
 type
         
-    TPalTable* = enum
-        ptMediaDesc = "media_desc",
+    TPalTable* = enum    
+        ptMediaDesc = "media_desc", ## Enums to define table names as in the SQL schema.        
         ptDirEntryDesc = "dir_entry_desc",
         ptTextDesc = "text_desc",
         ptTagDesc = "tag_desc",
         ptTagDirEntryAssoc = "tag_dir_entry_assoc"
+    
 
 
     TDirEntryDesc* = tuple
         ## used for inserting new entries and querrying
+        ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
         name, path: string
         fileSize: int64
@@ -36,6 +38,7 @@ type
 
     TMediaDesc* = tuple
         ## used for inserting new entries and querrying
+        ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
         name: string
         originalPath: string
@@ -77,18 +80,9 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     
 
 
-    
-#proc parseFileSize(s: string): int64 =
-#    try:
-#        result = parseInt64(s)
-#    except:
-#        raise newException(EInvalidValue, "failed parseFileSize for " & s)
-
-
-
 proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
     tuple[mediaId, rootId: TEntityId] =
-    # create media_desc, and root node
+    ## Creates media_desc, and root node and returs the IDs.
     result.mediaId = o.genIdFor(ptMediaDesc)
     result.rootId = o.genIdFor(ptDirEntryDesc)
     o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, "&
@@ -107,6 +101,7 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
 
 proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable.}=
     ## Creates directory entry and updates id field. Returns this id field.
+    ## descId field is set to NULL_ID !
     result = o.genIdFor(ptDirEntryDesc)
     e.id = result
     e.descId = NULL_ID    
@@ -122,6 +117,8 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable
     
 
 proc entityFieldsFromRow[TT](t: var TT, row: seq[string]) =
+    ## sets fields from t (except "id") by converting corresponding
+    ## row items by type TT declaration order!
     var r = 0    
     for k,v in fieldPairs(t):
         # skip id field, it's not in result
@@ -130,43 +127,41 @@ proc entityFieldsFromRow[TT](t: var TT, row: seq[string]) =
             r.inc
         
     assert(r == row.len)
-    
+
+
+proc entityFieldsFromRowAll[TT](t: var TT, row: seq[string]) =
+    ## sets fields from t by converting corresponding
+    ## row items by type TT declaration order!
+    var r = 0    
+    for v in fields(t):
+        v.fromSqlVal(row[r])
+        r.inc
+        
+    assert(r == row.len)
+
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
+    ## Read media by id, return false if no such media
     result = false
     var row = o.conn.getRow(TSqlQuery("select name, original_path, scan_time, "&
         "root_id from ? where id = ?"), $ptMediaDesc, id)
     if row.len > 0:
-        outM.id = id
-        
+        outM.id = id        
         outM.entityFieldsFromRow(row)        
-        
-        #outM.name.fromSqlVal(row[0])
-        #outM.originalPath.fromSqlVal(row[1])
-        #outM.scanTime.fromSqlVal(row[2])
-        #outM.rootId.fromSqlVal(row[3])
         return true
-        
-        
-         
+              
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
+    ## Read entry by id, return false if no such entry
     result = false
     var row = o.conn.getRow(TSQLQuery("select name, dir_path, file_size, mtime,"&
         " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, id)
     if row.len > 0:
         outE.id = id        
-        outE.entityFieldsFromRow(row)
-                
-        #outE.name = row[0]
-        #outE.path = row[1]
-        #outE.fileSize = parseFileSize(row[2])
-        #outE.mTime = timeFromSqlString(row[3])
-        #outE.isDir = parseSqlBool(row[4])
-        #outE.parentId = parseId(row[5])
-        #outE.descId = parseId(row[6])
-        
+        outE.entityFieldsFromRow(row)                        
         return true
+        
+        
 # ------------
 
 
