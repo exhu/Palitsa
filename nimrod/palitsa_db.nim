@@ -16,12 +16,14 @@ const
 
 type
         
-    TPalTable* = enum    
-        ptMediaDesc = "media_desc", ## Enums to define table names as in the SQL schema.        
+    TPalTable* = enum
+        ptMediaDesc = "media_desc",
         ptDirEntryDesc = "dir_entry_desc",
         ptTextDesc = "text_desc",
         ptTagDesc = "tag_desc",
         ptTagDirEntryAssoc = "tag_dir_entry_assoc"
+    ## Enums to define table
+    ## names as in the SQL schema.
     
 
 
@@ -94,12 +96,13 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     
     
     o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
-        "file_size, mtime, is_dir, desc_id) values(?,NULL,'','/',0,?,1, NULL);"), 
-        $ptDirEntryDesc, result.rootId.toSqlVal, scanTime.toSqlVal)
+        "file_size, mtime, is_dir, desc_id) values(?,NULL,'','/',0,?,1, NULL);"
+        ), $ptDirEntryDesc, result.rootId.toSqlVal, scanTime.toSqlVal)
 
 
 
-proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.discardable.}=
+proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
+    discardable .}=
     ## Creates directory entry and updates id field. Returns this id field.
     ## descId field is set to NULL_ID !
     result = o.genIdFor(ptDirEntryDesc)
@@ -154,8 +157,10 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
     result = false
-    var row = o.conn.getRow(TSQLQuery("select name, dir_path, file_size, mtime,"&
-        " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, id)
+    var row = o.conn.getRow(TSQLQuery(
+        "select name, dir_path, file_size, mtime," &
+        " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, 
+        id)
     if row.len > 0:
         outE.id = id        
         outE.entityFieldsFromRow(row)                        
