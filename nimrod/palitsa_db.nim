@@ -28,7 +28,7 @@ type
 
 
     TDirEntryDesc* = tuple
-        ## used for inserting new entries and querrying
+        ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
         name, path: string
@@ -39,7 +39,7 @@ type
         descId: TEntityId
 
     TMediaDesc* = tuple
-        ## used for inserting new entries and querrying
+        ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
         name: string

@@ -10,10 +10,11 @@ type
         ## table entry id holder, 0 = SQL NULL.
         ## use provided $, toInt64, toEntityId, parseId procs -- they
         ## convert to SQL string, int64, and vice versa.
-
-    TDbEntity* = object of TObject
-        ## represents a db table in native types
-        id: TEntityId
+    
+    
+    #    TDbEntity* = object of TObject
+    #        ## represents a db table in native types
+    #        id: TEntityId
 
 
     EMultiTransaction* = object of EDB

@@ -1,3 +1,5 @@
+## This file is probably OBSOLETE, but can be used to implement serialization
+
 import strutils, parseutils, times
 import typeinfo, tables
 
