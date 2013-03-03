@@ -182,6 +182,30 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
 
 
 
+proc entityFieldsFromRow*[TT](t: var TT, row: seq[string]) =
+    ## sets fields from t (except "id") by converting corresponding
+    ## row items by type TT declaration order!
+    var r = 0    
+    for k,v in fieldPairs(t):
+        # skip id field, it's not in result
+        if k != "id":            
+            v.fromSqlVal(row[r])
+            r.inc
+        
+    assert(r == row.len)
+
+
+proc entityFieldsFromRowAll*[TT](t: var TT, row: seq[string]) =
+    ## sets fields from t by converting corresponding
+    ## row items by type TT declaration order!
+    var r = 0    
+    for v in fields(t):
+        v.fromSqlVal(row[r])
+        r.inc
+        
+    assert(r == row.len)
+
+
 # ---------- sql parsing -------
 
 type
