@@ -59,8 +59,15 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
             for i in script:
                 #echo "executing '" & i & "'..."
                 db_sqlite.exec o.conn, TSqlQuery(i)
-    # todo check for proper version number
-            
+    
+    # check for proper version number
+    var ver = db_sqlite.getValue(o.conn, sql"select version_num from db_desc")
+    var iv: int
+    iv.fromSqlVal(ver)
+    if iv != PALITSA_SCHEMA_VERSION_INT:
+        raise newException(EDb, 
+            "Database ($1) does not match schema version $2".format( 
+             iv, PALITSA_SCHEMA_VERSION_INT))
     
     
 proc closeDb*(o: var TOpenDb) =    
@@ -146,4 +153,19 @@ proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
         
 # ------------
 
+proc countMedia*(o: var TOpenDb): int =
+    ## Counts amount of media sources stored in the db.
+    var row = o.conn.getRow(sql"select count(*) from ?", $ptMediaDesc)
+    result.fromSqlVal(row[0])
+    
+    # TODO add test for mediaCount
+    
+iterator iterateMedia*(o: var TOpenDb, offset, limit: int): TMediaDesc =
+    # TODO iterate over all
+    nil
+    
 
+proc findMediaIdFromDirEntryId(o: var TOpenDb, 
+    dirEntryId: TEntityId): TEntityId =
+    # TODO hierarchically find the root and get media desc id
+    
