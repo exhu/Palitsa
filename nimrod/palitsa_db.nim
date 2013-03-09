@@ -58,7 +58,7 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
         inTransaction(o):
             for i in script:
                 #echo "executing '" & i & "'..."
-                db_sqlite.exec o.conn, TSqlQuery(i)
+                db_sqlite.exec o.conn, sql(i)
     
     # check for proper version number
     var ver = db_sqlite.getValue(o.conn, sql"select version_num from db_desc")
@@ -94,7 +94,7 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     ## Creates media_desc, and root node and returs the IDs.
     result.mediaId = o.genIdFor(ptMediaDesc)
     result.rootId = o.genIdFor(ptDirEntryDesc)
-    o.conn.exec(TSqlQuery("insert into ? (id, name, original_path, scan_time, "&
+    o.conn.exec(sql("insert into ? (id, name, original_path, scan_time, "&
         "root_id) values(?,?,?,?,?);"), $ptMediaDesc, result.mediaId.toSqlVal, 
         name.toSqlVal, 
         path.toSqlVal, 
@@ -102,7 +102,7 @@ proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime):
     
     
     
-    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
+    o.conn.exec(sql("insert into ? (id, parent_id, dir_path, name, "&
         "file_size, mtime, is_dir, desc_id) values(?,NULL,'','/',0,?,1, NULL);"
         ), $ptDirEntryDesc, result.rootId.toSqlVal, scanTime.toSqlVal)
 
@@ -119,7 +119,7 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
     if e.path == nil:
         e.path = ""
  
-    o.conn.exec(TSqlQuery("insert into ? (id, parent_id, dir_path, name, "&
+    o.conn.exec(sql("insert into ? (id, parent_id, dir_path, name, "&
         "file_size, mtime, is_dir, desc_id) values(?,?,?,?,?,?,?,NULL);"), 
         $ptDirEntryDesc, result.toSqlVal, e.parentId.toSqlVal, 
         e.path.toSqlVal, e.name.toSqlVal, e.fileSize.toSqlVal, 
@@ -130,7 +130,7 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     ## Read media by id, return false if no such media
     result = false
-    var row = o.conn.getRow(TSqlQuery("select name, original_path, scan_time, "&
+    var row = o.conn.getRow(sql("select name, original_path, scan_time, "&
         "root_id from ? where id = ?"), $ptMediaDesc, id)
     if row.len > 0:
         outM.id = id        
@@ -141,7 +141,7 @@ proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
     result = false
-    var row = o.conn.getRow(TSQLQuery(
+    var row = o.conn.getRow(sql(
         "select name, dir_path, file_size, mtime," &
         " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, 
         id)
@@ -160,8 +160,13 @@ proc countMedia*(o: var TOpenDb): int =
 
 
 iterator iterateMedia*(o: var TOpenDb, offset, limit: int): TMediaDesc =
-    # TODO iterate over all
-    nil
+    ## iterate over all media descriptors
+    for r in o.conn.rows(sql("select id, name, original_path, scan_time, "&
+        "root_id from ? limit ? offset ?"), $ptMediaDesc, limit, offset):
+        var e: TMediaDesc
+        e.entityFieldsFromRowAll(r)
+        yield e
+        
     
 
 proc findMediaIdFromDirEntryId(o: var TOpenDb, 

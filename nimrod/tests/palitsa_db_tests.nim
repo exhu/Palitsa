@@ -101,6 +101,26 @@ suite "db open suite":
             
         res = countMedia(myDb)
         check res == 2
+    
+
+    test "iterateMedia":
+            
+        inTransaction(myDb):
+            var t: TTime
+            var m = myDb.createMedia("name1", "path1", t)
+            m = myDb.createMedia("name2", "path2", t)
         
+        var 
+            cnt = myDb.countMedia
+            found: seq[string] = @[]
+            
+        #found.newSeq
+        for m in myDb.iterateMedia(offset = 0, limit = cnt):
+            found.add(m.name)
+            echo m.name & ", " & m.originalPath
+            
+        check found.len == 2
+        check found.contains("name1") == true
+        check found.contains("name2") == true
 
 echo "null = " & $toEntityId(0)
