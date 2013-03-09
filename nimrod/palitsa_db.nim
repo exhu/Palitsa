@@ -157,9 +157,8 @@ proc countMedia*(o: var TOpenDb): int =
     ## Counts amount of media sources stored in the db.
     var row = o.conn.getRow(sql"select count(*) from ?", $ptMediaDesc)
     result.fromSqlVal(row[0])
-    
-    # TODO add test for mediaCount
-    
+
+
 iterator iterateMedia*(o: var TOpenDb, offset, limit: int): TMediaDesc =
     # TODO iterate over all
     nil

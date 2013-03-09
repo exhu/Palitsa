@@ -83,5 +83,24 @@ suite "db open suite":
         echo "encoded/decoded time = " & $t
         
             
+    test "countMedia":
+        var res = countMedia(myDb)
+        check res == 0
+            
+        inTransaction(myDb):
+            var t: TTime
+            var m = myDb.createMedia("name", "path", t)
+            echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
+            
+            res = countMedia(myDb)
+            check res == 1
+            
+            m = myDb.createMedia("name2", "path2", t)
+            echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
+            
+            
+        res = countMedia(myDb)
+        check res == 2
+        
 
 echo "null = " & $toEntityId(0)
