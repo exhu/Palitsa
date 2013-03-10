@@ -225,6 +225,20 @@ template iterateTabl*(o: var TOpenDb, allFields: string, offset, limit: int64,
         e.entityFieldsFromRowAll(r)
         yield e
 
+
+template findRow*(o: var TOpenDb, allFields: string, t: expr,
+    id: TEntityId, outM: var expr): stmt =
+    ## find table row by id.
+    ## allFields = string of comma-separated sql column names.
+    ## t = table enum, outM = table row desc tuple.
+
+    result = false
+    var row = o.conn.getRow(sql("select "& allFields &
+        " from ? where id = ?"), $t, id)
+    if row.len > 0:
+        outM.entityFieldsFromRowAll(row)        
+        return true
+
 # ---------- sql parsing -------
 
 type

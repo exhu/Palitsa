@@ -31,12 +31,13 @@ type
         ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
-        name, path: string
+        parentId: TEntityId
+        path: string
+        name: string
         fileSize: int64
         mTime: TTime
         isDir: bool
-        parentId: TEntityId
-        descId: TEntityId
+        descId: TEntityId 
 
     TMediaDesc* = tuple
         ## used for inserting new entries and querrying.
@@ -47,7 +48,10 @@ type
         scanTime: TTime
         rootId: TEntityId
 
-
+const
+    MediaDescColumns = "id,name,original_path,scan_time,root_id"
+    DirEntryDescColumns = "id,parent_id,dir_path,name,file_size,"&
+        "mtime,is_dir,desc_id"
 
 proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =  
     if recreate:
@@ -129,26 +133,12 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     ## Read media by id, return false if no such media
-    result = false
-    var row = o.conn.getRow(sql("select name, original_path, scan_time, "&
-        "root_id from ? where id = ?"), $ptMediaDesc, id)
-    if row.len > 0:
-        outM.id = id        
-        outM.entityFieldsFromRow(row)        
-        return true
+    findRow(o, MediaDescColumns, ptMediaDesc, id, outM)
               
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
-    result = false
-    var row = o.conn.getRow(sql(
-        "select name, dir_path, file_size, mtime," &
-        " is_dir, parent_id, desc_id from ? where id = ?"), $ptDirEntryDesc, 
-        id)
-    if row.len > 0:
-        outE.id = id        
-        outE.entityFieldsFromRow(row)                        
-        return true
+    findRow(o, DirEntryDescColumns, ptDirEntryDesc, id, outE)
         
         
 # ------------
@@ -161,7 +151,7 @@ proc countMedia*(o: var TOpenDb): int64 =
 
 iterator iterateMedia*(o: var TOpenDb, offset, limit: int64): TMediaDesc =
     ## iterate over all media descriptors
-    iterateTabl(o, "id, name, original_path, scan_time, root_id", offset, 
+    iterateTabl(o, MediaDescColumns, offset, 
         limit, ptMediaDesc, TMediaDesc)
     
 
@@ -172,8 +162,8 @@ proc countDirEntry*(o: var TOpenDb): int64 =
 
 iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
     ## iterate over all dir entries
-    iterateTabl(o, "id, name, dir_path, file_size, mtime, is_dir, parent_id, "&
-        "desc_id", offset, limit, ptDirEntryDesc, TDirEntryDesc)
+    iterateTabl(o, DirEntryDescColumns, offset, limit, ptDirEntryDesc, 
+        TDirEntryDesc)
 
 
 proc findMediaIdFromDirEntryId(o: var TOpenDb, 
