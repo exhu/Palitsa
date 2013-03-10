@@ -16,17 +16,15 @@ const
 
 type
         
-    TPalTable* = enum
-        ptMediaDesc = "media_desc",
-        ptDirEntryDesc = "dir_entry_desc",
-        ptTextDesc = "text_desc",
-        ptTagDesc = "tag_desc",
-        ptTagDirEntryAssoc = "tag_dir_entry_assoc"
-    ## Enums to define table
-    ## names as in the SQL schema.
+    TPalTable* = enum ## Enums to define table \
+        ## names as in the SQL schema.
+        ptMediaDesc = "media_desc", ## media
+        ptDirEntryDesc = "dir_entry_desc",  ## file or directory
+        ptTextDesc = "text_desc", ## text description
+        ptTagDesc = "tag_desc", ## tags
+        ptTagDirEntryAssoc = "tag_dir_entry_assoc" ## tags and dir associations
     
-
-
+    
     TDirEntryDesc* = tuple
         ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!

@@ -239,6 +239,20 @@ template findRow*(o: var TOpenDb, allFields: string, t: expr,
         outM.entityFieldsFromRowAll(row)        
         return true
 
+
+proc indexOf*(t: typedesc, name: string): int  {.compiletime.} =
+    ## takes a tuple and looks for the field by name.
+    ## returs index of that field.
+    var 
+        d: t
+        i = 0
+    for n, x in fieldPairs(d): 
+        if n == name: return i
+        i.inc
+        
+    raise newException(EInvalidValue, "No field " & name & " in type " & astToStr(t))
+
+
 # ---------- sql parsing -------
 
 type

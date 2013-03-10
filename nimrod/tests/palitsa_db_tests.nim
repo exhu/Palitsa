@@ -142,5 +142,10 @@ suite "db open suite":
             iterEntries.inc
             
         check iterEntries == 2
+        
+        
+    test "indexOf":
+        const r = indexOf(TMediaDesc, "path")
+        check r == 2
 
 echo "null = " & $toEntityId(0)
