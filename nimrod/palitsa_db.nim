@@ -153,21 +153,28 @@ proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
         
 # ------------
 
-proc countMedia*(o: var TOpenDb): int =
-    ## Counts amount of media sources stored in the db.
-    var row = o.conn.getRow(sql"select count(*) from ?", $ptMediaDesc)
-    result.fromSqlVal(row[0])
-
-
-iterator iterateMedia*(o: var TOpenDb, offset, limit: int): TMediaDesc =
-    ## iterate over all media descriptors
-    for r in o.conn.rows(sql("select id, name, original_path, scan_time, "&
-        "root_id from ? limit ? offset ?"), $ptMediaDesc, limit, offset):
-        var e: TMediaDesc
-        e.entityFieldsFromRowAll(r)
-        yield e
         
+proc countMedia*(o: var TOpenDb): int64 =
+    ## Counts amount of media sources stored in the db.
+    countTabl(o, ptMediaDesc)
+
+
+iterator iterateMedia*(o: var TOpenDb, offset, limit: int64): TMediaDesc =
+    ## iterate over all media descriptors
+    iterateTabl(o, "id, name, original_path, scan_time, root_id", offset, 
+        limit, ptMediaDesc, TMediaDesc)
     
+
+proc countDirEntry*(o: var TOpenDb): int64 =
+    ## Counts amount of directory entries stored in the db.
+    countTabl(o, ptDirEntryDesc)
+
+
+iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
+    ## iterate over all dir entries
+    iterateTabl(o, "id, name, dir_path, file_size, mtime, is_dir, parent_id, "&
+        "desc_id", offset, limit, ptDirEntryDesc, TDirEntryDesc)
+
 
 proc findMediaIdFromDirEntryId(o: var TOpenDb, 
     dirEntryId: TEntityId): TEntityId =

@@ -206,6 +206,25 @@ proc entityFieldsFromRowAll*[TT](t: var TT, row: seq[string]) =
     assert(r == row.len)
 
 
+template countTabl*(o: var TOpenDb, t: expr): stmt =
+    ## Counts amount of rows for table stored in the db.
+    ## t = table enum.
+    var row = o.conn.getRow(sql"select count(*) from ?", $t)
+    result.fromSqlVal(row[0])
+
+
+template iterateTabl*(o: var TOpenDb, allFields: string, offset, limit: int64, 
+    t: expr, desc: expr): stmt =
+    ## iterate over all table rows.
+    ## allFields = string with sql column names separated by commas,
+    ## MUST PRESERVE the order of the tuple passed in desc.
+    ## t = table enum, desc = tuple.
+    for r in o.conn.rows(sql("select "& allFields &
+        " from ? limit ? offset ?"), $t, limit, offset):
+        var e: desc
+        e.entityFieldsFromRowAll(r)
+        yield e
+
 # ---------- sql parsing -------
 
 type

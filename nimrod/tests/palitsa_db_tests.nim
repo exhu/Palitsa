@@ -83,7 +83,7 @@ suite "db open suite":
         echo "encoded/decoded time = " & $t
         
             
-    test "countMedia":
+    test "countMedia, dirEntry":
         var res = countMedia(myDb)
         check res == 0
             
@@ -95,15 +95,29 @@ suite "db open suite":
             res = countMedia(myDb)
             check res == 1
             
+            # one root entry per media at least
+            res = countDirEntry(myDb)
+            check res == 1
+            
+            var e: TDirEntryDesc
+            e.name = "testtt"
+            e.parentId = m.rootId
+            myDb.createEntry(e)
+            
             m = myDb.createMedia("name2", "path2", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
             
             
         res = countMedia(myDb)
         check res == 2
+        
+        
+        # root entries + one custom
+        res = countDirEntry(myDb)
+        check res == 3
     
 
-    test "iterateMedia":
+    test "iterateMedia, dirEntry":
             
         inTransaction(myDb):
             var t: TTime
@@ -122,5 +136,11 @@ suite "db open suite":
         check found.len == 2
         check found.contains("name1") == true
         check found.contains("name2") == true
+        
+        var iterEntries = 0
+        for e in myDb.iterateDirEntry(offset = 0, limit = cnt):
+            iterEntries.inc
+            
+        check iterEntries == 2
 
 echo "null = " & $toEntityId(0)
