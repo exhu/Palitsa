@@ -17,7 +17,7 @@ const
 type
         
     TPalTable* = enum ## Enums to define table \
-        ## names as in the SQL schema.
+        ## names as in the SQL schema, used by id generator and other utils.
         ptMediaDesc = "media_desc", ## media
         ptDirEntryDesc = "dir_entry_desc",  ## file or directory
         ptTextDesc = "text_desc", ## text description
@@ -47,8 +47,10 @@ type
         rootId: TEntityId
 
 const
-    MediaDescColumns = "id,name,original_path,scan_time,root_id"
-    DirEntryDescColumns = "id,parent_id,dir_path,name,file_size,"&
+    # TODO make tightly related to the tuple
+    MediaDescColumns* = "id,name,original_path,scan_time,root_id"
+        ## SQL column names following order of the TMediaDesc tuple.
+    DirEntryDescColumns* = "id,parent_id,dir_path,name,file_size,"&
         "mtime,is_dir,desc_id"
 
 proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =  

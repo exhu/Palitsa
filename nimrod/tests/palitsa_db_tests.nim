@@ -145,8 +145,9 @@ suite "db open suite":
         
         
     test "indexOf":
-        echo "indexOf test disabled!"
-        #let r = indexOf(TMediaDesc, "path")
-        #check r == 2
+        #echo "indexOf test disabled!"
+        let r = TMediaDesc.indexOf("originalPath")
+        check r == 2
 
-echo "null = " & $toEntityId(0)
+#echo "null = " & $toEntityId(0)
+
