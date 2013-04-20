@@ -34,9 +34,10 @@ macro defDataset(stmts: stmt): stmt =
     
 
 {.pragma: id_sql.}
+{.pragma: my_ds_table.}
 dumpTree:
     type
-        TMyDs = object
+        TMyDs = object {.my_ds_table.}
             ## used for inserting new entries and querrying.
             ## FIELD ORDER IS IMPORTANT!
             id {.id_sql.}: TEntityId # SQL=id
@@ -45,7 +46,10 @@ dumpTree:
             scanTime: TTime # SQL=scan_time
             rootId: TEntityId # SQL=root_id
 
-dumpTree:
+
+
+# tuples do not support pragmas attached to fields, desired result
+dumpTreeImm:
     type 
         TDirEntryDesc* = tuple
             ## used for inserting new entries and querrying.
@@ -54,3 +58,67 @@ dumpTree:
             parentId: TEntityId
             path: string
             name: string
+            
+    const
+        DirEntryDescTableName* = "my_ds_table"
+        DirEntryDescTableColumns* = ["id_sql", "name"]
+        DirEntryDescTableColumnsString* = "id_sql,name"
+
+discard """
+StmtList
+  TypeSection
+    TypeDef
+      Ident !"TMyDs"
+      Empty
+      ObjectTy
+        Empty
+        Empty
+        RecList
+          IdentDefs
+            PragmaExpr
+              Ident !"id"
+              Pragma
+                Ident !"id_sql"
+            Ident !"TEntityId"
+            Empty
+          IdentDefs
+            Ident !"name"
+            Ident !"string"
+            Empty
+          IdentDefs
+            Ident !"originalPath"
+            Ident !"string"
+            Empty
+          IdentDefs
+            Ident !"scanTime"
+            Ident !"TTime"
+            Empty
+          IdentDefs
+            Ident !"rootId"
+            Ident !"TEntityId"
+            Empty
+StmtList
+  TypeSection
+    TypeDef
+      Postfix
+        Ident !"*"
+        Ident !"TDirEntryDesc"
+      Empty
+      TupleTy
+        IdentDefs
+          Ident !"id"
+          Ident !"TEntityId"
+          Empty
+        IdentDefs
+          Ident !"parentId"
+          Ident !"TEntityId"
+          Empty
+        IdentDefs
+          Ident !"path"
+          Ident !"string"
+          Empty
+        IdentDefs
+          Ident !"name"
+          Ident !"string"
+          Empty
+"""

@@ -184,7 +184,8 @@ proc endTransaction*(o: var TOpenDb, rollback: bool = false) =
 
 proc entityFieldsFromRow*[TT](t: var TT, row: seq[string]) =
     ## sets fields from t (except "id") by converting corresponding
-    ## row items by type TT declaration order!
+    ## row items by type TT declaration order, where row is a result set.
+    ## the "id" field must be not in the row result, it is ignored.
     var r = 0    
     for k,v in fieldPairs(t):
         # skip id field, it's not in result
@@ -197,7 +198,7 @@ proc entityFieldsFromRow*[TT](t: var TT, row: seq[string]) =
 
 proc entityFieldsFromRowAll*[TT](t: var TT, row: seq[string]) =
     ## sets fields from t by converting corresponding
-    ## row items by type TT declaration order!
+    ## row items by type TT declaration order! row is the sql result set.
     var r = 0    
     for v in fields(t):
         v.fromSqlVal(row[r])
@@ -207,7 +208,7 @@ proc entityFieldsFromRowAll*[TT](t: var TT, row: seq[string]) =
 
 
 template countTabl*(o: var TOpenDb, t: expr): stmt =
-    ## Counts amount of rows for table stored in the db.
+    ## Counts amount of rows for sql table stored in the db.
     ## t = table enum.
     var row = o.conn.getRow(sql"select count(*) from ?", $t)
     result.fromSqlVal(row[0])
@@ -217,8 +218,9 @@ template iterateTabl*(o: var TOpenDb, allFields: string, offset, limit: int64,
     t: expr, desc: expr): stmt =
     ## iterate over all table rows.
     ## allFields = string with sql column names separated by commas,
-    ## MUST PRESERVE the order of the tuple passed in desc.
+    ## MUST be in the order of the tuple passed in desc.
     ## t = table enum, desc = tuple.
+    ## returns entities via *yield*.
     for r in o.conn.rows(sql("select "& allFields &
         " from ? limit ? offset ?"), $t, limit, offset):
         var e: desc
