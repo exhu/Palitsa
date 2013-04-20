@@ -64,13 +64,16 @@ dumpTreeImm:
         DirEntryDescTableColumns = ["id_sql", "name"]
         DirEntryDescTableColumnsString = "id_sql,name"
         
-    proc TableNameOf*(t: TDirEntryDesc): string {.inline.} =
+    proc tableName*(t: TDirEntryDesc): string {.inline.} =
+        ## returns the sql name of the table that t maps to.
         return DirEntryDescTableName
         
-    proc ColumnsOf*(t: TDirEntryDesc): array of string {.inline.} =
+    proc columns*(t: TDirEntryDesc): array of string {.inline.} =
+        ## returs array of column names
         return DirEntryDescTableColumns
         
-    proc ColumnsStringOf*(t: TDirEntryDesc): string {.inline.} =
+    proc columnsString*(t: TDirEntryDesc): string {.inline.} =
+        ## returns comma separated string of column names
         return DirEntryDescTableColumnsString
 
 discard """
