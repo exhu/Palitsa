@@ -60,9 +60,18 @@ dumpTreeImm:
             name: string
             
     const
-        DirEntryDescTableName* = "my_ds_table"
-        DirEntryDescTableColumns* = ["id_sql", "name"]
-        DirEntryDescTableColumnsString* = "id_sql,name"
+        DirEntryDescTableName = "my_ds_table"
+        DirEntryDescTableColumns = ["id_sql", "name"]
+        DirEntryDescTableColumnsString = "id_sql,name"
+        
+    proc TableNameOf*(t: TDirEntryDesc): string {.inline.} =
+        return DirEntryDescTableName
+        
+    proc ColumnsOf*(t: TDirEntryDesc): array of string {.inline.} =
+        return DirEntryDescTableColumns
+        
+    proc ColumnsStringOf*(t: TDirEntryDesc): string {.inline.} =
+        return DirEntryDescTableColumnsString
 
 discard """
 StmtList
