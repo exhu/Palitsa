@@ -23,6 +23,10 @@ dataSet:
     
 """
 
+template fail(msg : string): stmt =
+    echo(msg & ", " & $InstantiationInfo())
+    raise newException(EAssertionFailed, "failure")
+
 template ensureNode(a, e: TNimrodNodeKind) : stmt =
     if e != a:
         
