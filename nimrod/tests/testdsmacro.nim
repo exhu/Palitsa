@@ -23,8 +23,25 @@ dataSet:
     
 """
 
-macro defDataset(stmts: stmt): stmt =
-    nil
+template ensureNode(a, e: TNimrodNodeKind) : stmt =
+    if e != a:
+        
+        echo("expected " & $e & " got " & $a & " at " & $InstantiationInfo())
+        raise newException(EInvalidValue, "wrong expression")
+        #{. fatal: "expected" .}
+
+macro defDataset(stmts: stmt): stmt {.immediate.}=
+    # okay, stmts = nnkStmtList
+    #ensureNode(stmts[0].kind, nnkTypeSection)
+    # find nnkTypeDef, read son ident
+    # find nnkObjectTy node
+    # replace with tuple
+    # read nnkPragma as ObjectTy son, read Ident as son of nnkPragma
+    # replace nnkPragma with nnkEmpty
+    
+    # find IdentDefs, if son = PragmaExpr, then parse field name from it
+    
+    result = stmts
     
 #template fieldCol(c: string, f: string, t: typedesc) =
 #    nil
@@ -35,7 +52,9 @@ macro defDataset(stmts: stmt): stmt =
 
 {.pragma: id_sql.}
 {.pragma: my_ds_table.}
-dumpTree:
+#dumpTree:
+defDataSet:
+    # abc
     type
         TMyDs = object {.my_ds_table.}
             ## used for inserting new entries and querrying.
@@ -49,7 +68,8 @@ dumpTree:
 
 
 # tuples do not support pragmas attached to fields, desired result
-dumpTreeImm:
+discard """
+#dumpTreeImm:
     type 
         TDirEntryDesc* = tuple
             ## used for inserting new entries and querrying.
@@ -75,6 +95,8 @@ dumpTreeImm:
     proc columnsString*(t: TDirEntryDesc): string {.inline.} =
         ## returns comma separated string of column names
         return DirEntryDescTableColumnsString
+
+"""
 
 discard """
 StmtList
