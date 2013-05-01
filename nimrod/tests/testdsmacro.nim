@@ -27,12 +27,12 @@ template fail(msg : string): stmt =
     echo(msg & ", " & $InstantiationInfo())
     raise newException(EAssertionFailed, "failure")
 
-template ensureNode(a, e: TNimrodNodeKind) : stmt =
-    if e != a:
-        
-        echo("expected " & $e & " got " & $a & " at " & $InstantiationInfo())
-        raise newException(EInvalidValue, "wrong expression")
-        #{. fatal: "expected" .}
+#template ensureNode(a, e: TNimrodNodeKind) : stmt =
+#    if e != a:
+#        
+#        error("expected " & $e & " got " & $a & " at " & $InstantiationInfo())
+#        #raise newException(EInvalidValue, "wrong expression")
+#        #{. fatal: "expected" .}
 
 macro defDataset(stmts: stmt): stmt {.immediate.}=
     # okay, stmts = nnkStmtList
@@ -44,6 +44,14 @@ macro defDataset(stmts: stmt): stmt {.immediate.}=
     # replace nnkPragma with nnkEmpty
     
     # find IdentDefs, if son = PragmaExpr, then parse field name from it
+    
+    #expectKind
+    var n = stmts[0] 
+    if n.kind == nnkCommentStmt:
+        n = stmts[1]
+    
+    #n.expectKind(nnkTypeSection)
+    
     
     result = stmts
     
@@ -59,7 +67,9 @@ macro defDataset(stmts: stmt): stmt {.immediate.}=
 #dumpTree:
 defDataSet:
     # abc
+    ## ccc
     type
+        # aaa
         TMyDs = object {.my_ds_table.}
             ## used for inserting new entries and querrying.
             ## FIELD ORDER IS IMPORTANT!
