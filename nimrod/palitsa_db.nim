@@ -144,12 +144,12 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     ## Read media by id, return false if no such media
-    findRow(o, outM.tableName, id, outM)
+    return findRow(o, outM.tableName, id, outM)
               
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
-    findRow(o, outE.tableName, id, outE)
+    return findRow(o, outE.tableName, id, outE)
         
         
 # ------------
@@ -157,24 +157,25 @@ proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
         
 proc countMedia*(o: var TOpenDb): int64 =
     ## Counts amount of media sources stored in the db.
-    countTabl(o, ptMediaDesc)
+    return countTabl(o, $ptMediaDesc)
 
 
 iterator iterateMedia*(o: var TOpenDb, offset, limit: int64): TMediaDesc =
     ## iterate over all media descriptors
-    iterateTabl(o, result.columnsString, offset, 
-        limit, ptMediaDesc, TMediaDesc)
+    for e in iterateTabl[TMediaDesc](o, offset, 
+        limit):
+        yield e
     
 
 proc countDirEntry*(o: var TOpenDb): int64 =
     ## Counts amount of directory entries stored in the db.
-    countTabl(o, ptDirEntryDesc)
+    return countTabl(o, $ptDirEntryDesc)
 
 
 iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
     ## iterate over all dir entries
-    iterateTabl(o, result.columnsString, offset, limit, ptDirEntryDesc, 
-        TDirEntryDesc)
+    for e in iterateTabl[TDirEntryDesc](o, offset, limit):
+        yield e
 
 
 proc findMediaIdFromDirEntryId(o: var TOpenDb, 

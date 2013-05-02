@@ -207,29 +207,27 @@ proc entityFieldsFromRowAll*[TT](t: var TT, row: seq[string]) =
     assert(r == row.len)
 
 
-template countTabl*(o: var TOpenDb, t: expr): stmt =
+proc countTabl*(o: var TOpenDb, tableName: string): int64 =
     ## Counts amount of rows for sql table stored in the db.
     ## t = table enum.
-    var row = o.conn.getRow(sql"select count(*) from ?", $t)
+    var row = o.conn.getRow(sql"select count(*) from ?", tableName)
     result.fromSqlVal(row[0])
 
 
-template iterateTabl*(o: var TOpenDb, allFields: string, offset, limit: int64, 
-    t: expr, desc: expr): stmt =
+iterator iterateTabl*[TEnt](o: var TOpenDb, offset, 
+    limit: int64): TEnt =
     ## iterate over all table rows.
-    ## allFields = string with sql column names separated by commas,
-    ## MUST be in the order of the tuple passed in desc.
-    ## t = table enum, desc = tuple.
+    ## tableName = sql table name, desc = tuple.
     ## returns entities via *yield*.
-    for r in o.conn.rows(sql("select "& allFields &
-        " from ? limit ? offset ?"), $t, limit, offset):
-        var e: desc
+    var e: TEnt
+    for r in o.conn.rows(sql("select "& e.columnsString &
+        " from ? limit ? offset ?"), e.tableName, limit, offset):
         e.entityFieldsFromRowAll(r)
         yield e
 
 
 proc findRow*[TEnt](o: var TOpenDb, tableName: string,
-    id: TEntityId, outM: var TEnt): stmt =
+    id: TEntityId, outM: var TEnt): bool =
     ## find table row by id.
     ## allFields = string of comma-separated sql column names.
     ## tableName = table sql name, outM = table row desc tuple.
