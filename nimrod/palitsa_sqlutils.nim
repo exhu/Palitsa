@@ -228,17 +228,17 @@ template iterateTabl*(o: var TOpenDb, allFields: string, offset, limit: int64,
         yield e
 
 
-template findRow*(o: var TOpenDb, allFields: string, t: expr,
-    id: TEntityId, outM: var expr): stmt =
+proc findRow*[TEnt](o: var TOpenDb, tableName: string,
+    id: TEntityId, outM: var TEnt): stmt =
     ## find table row by id.
     ## allFields = string of comma-separated sql column names.
-    ## t = table enum, outM = table row desc tuple.
+    ## tableName = table sql name, outM = table row desc tuple.
 
     result = false
-    var row = o.conn.getRow(sql("select "& allFields &
-        " from ? where id = ?"), $t, id)
+    var row = o.conn.getRow(sql("select "& outM.columnsString &
+        " from ? where id = ?"), tableName, id)
     if row.len > 0:
-        outM.entityFieldsFromRowAll(row)        
+        outM.entityFieldsFromRowAll(row)
         return true
 
 

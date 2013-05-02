@@ -45,13 +45,24 @@ type
         originalPath: string
         scanTime: TTime
         rootId: TEntityId
-
-const
-    # TODO make tightly related to the tuple
-    MediaDescColumns* = "id,name,original_path,scan_time,root_id"
-        ## SQL column names following order of the TMediaDesc tuple.
-    DirEntryDescColumns* = "id,parent_id,dir_path,name,file_size,"&
+        
+# -----
+proc columnsString(m: TMediaDesc): string =
+    ## returns comma-separated field names as a string
+    return "id,name,original_path,scan_time,root_id"
+    
+proc columnsString(d: TDirEntryDesc): string =
+    ## returns comma-separated field names as a string
+    return "id,parent_id,dir_path,name,file_size,"&
         "mtime,is_dir,desc_id"
+
+proc tableName(m: TMediaDesc): string =
+    return $ptMediaDesc
+
+proc tableName(d: TDirEntryDesc): string =
+    return $ptDirEntryDesc
+
+# --------
 
 proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =  
     if recreate:
@@ -133,12 +144,12 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
 
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     ## Read media by id, return false if no such media
-    findRow(o, MediaDescColumns, ptMediaDesc, id, outM)
+    findRow(o, outM.tableName, id, outM)
               
  
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
-    findRow(o, DirEntryDescColumns, ptDirEntryDesc, id, outE)
+    findRow(o, outE.tableName, id, outE)
         
         
 # ------------
@@ -151,7 +162,7 @@ proc countMedia*(o: var TOpenDb): int64 =
 
 iterator iterateMedia*(o: var TOpenDb, offset, limit: int64): TMediaDesc =
     ## iterate over all media descriptors
-    iterateTabl(o, MediaDescColumns, offset, 
+    iterateTabl(o, result.columnsString, offset, 
         limit, ptMediaDesc, TMediaDesc)
     
 
@@ -162,7 +173,7 @@ proc countDirEntry*(o: var TOpenDb): int64 =
 
 iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
     ## iterate over all dir entries
-    iterateTabl(o, DirEntryDescColumns, offset, limit, ptDirEntryDesc, 
+    iterateTabl(o, result.columnsString, offset, limit, ptDirEntryDesc, 
         TDirEntryDesc)
 
 
