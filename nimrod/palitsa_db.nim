@@ -178,7 +178,20 @@ iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
         yield e
 
 
-proc findMediaIdFromDirEntryId(o: var TOpenDb, 
+proc findMediaIdFromDirEntryId*(o: var TOpenDb, 
     dirEntryId: TEntityId): TEntityId =
-    # TODO hierarchically find the root and get media desc id
+    # hierarchically find the root and get media desc id
+    var dent: TDirEntryDesc
+    var nextId = dirEntryId
     
+    while nextId != NULL_ID:
+        if o.findEntry(nextId, dent) == false:
+            raise newException(EDb, "No direntry for id = " & $dirEntryId)        
+        nextId = dent.parentId
+    
+    var row = o.conn.getRow(sql"select id from ? where root_id = ?", 
+        $ptMediaDesc, dent.id)
+        
+    result.fromSqlVal(row[0])
+    
+

@@ -83,9 +83,13 @@ suite "db open suite":
         echo "encoded/decoded time = " & $t
         
             
-    test "countMedia, dirEntry":
+    test "countMedia, dirEntry, findMediaIdFromDirEntryId":
         var res = countMedia(myDb)
         check res == 0
+        
+        var 
+            rootToFind: TEntityId
+            medToFind: TEntityId
             
         inTransaction(myDb):
             var t: TTime
@@ -106,6 +110,8 @@ suite "db open suite":
             
             m = myDb.createMedia("name2", "path2", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
+            rootToFind = m.rootId
+            medToFind = m.mediaId
             
             
         res = countMedia(myDb)
@@ -115,6 +121,9 @@ suite "db open suite":
         # root entries + one custom
         res = countDirEntry(myDb)
         check res == 3
+        
+        var foundId = myDb.findMediaIdFromDirEntryId(rootToFind)
+        check foundId == medToFind
     
 
     test "iterateMedia, dirEntry":

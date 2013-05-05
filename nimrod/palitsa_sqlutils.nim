@@ -250,7 +250,8 @@ proc indexOf*(t: typedesc, name: string): int  {.compiletime.} =
         if n == name: return i
         i.inc
         
-    raise newException(EInvalidValue, "No field " & name & " in type " & astToStr(t))
+    raise newException(EInvalidValue, "No field " & name & " in type " & 
+        astToStr(t))
 
 
 # ---------- sql parsing -------
