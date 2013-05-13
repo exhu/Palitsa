@@ -1,3 +1,5 @@
+import os
+
 type
     TScanIface* = object
         onNewFile: proc()
@@ -6,4 +8,11 @@ type
 
 
 proc scanPath*(path: string, scanIface: TScanIface) =
-    nil
+    for k,p in path.walkDir:
+        echo($k, " ", p)
+    
+    
+var si: TScanIface
+    
+scanPath "./", si
+
