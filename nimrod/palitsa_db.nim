@@ -25,7 +25,7 @@ type
         ptTagDirEntryAssoc = "tag_dir_entry_assoc" ## tags and dir associations
     
     
-    TDirEntryDesc* = tuple
+    TDirEntryDesc* = tuple ## \
         ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
@@ -37,7 +37,7 @@ type
         isDir: bool
         descId: TEntityId 
 
-    TMediaDesc* = tuple
+    TMediaDesc* = tuple ## \
         ## used for inserting new entries and querrying.
         ## FIELD ORDER IS IMPORTANT!
         id: TEntityId
