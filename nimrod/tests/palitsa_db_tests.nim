@@ -1,6 +1,6 @@
-import times, parseutils, unittest
+import times, parseutils, unittest, os
 
-import logging, palitsa_sqlutils, palitsa_db
+import logging, palitsa_sqlutils, palitsa_db, palitsa_scan
 
 suite "db open suite":
     var myDb: TOpenDb
@@ -157,6 +157,26 @@ suite "db open suite":
         #echo "indexOf test disabled!"
         let r = TMediaDesc.indexOf("originalPath")
         check r == 2
+        
+    test "scan":
+        createDir("tempdir")
+        createDir("tempdir/tempdir1")
+        createDir("tempdir/tempdir2")
+        createDir("tempdir/tempdir2/tempdir3")
+        
+        let filesToCreate = ["tempdir/fl1.a", "tempdir/fl2.b",
+            "tempdir/tempdir2/fl3.e", "tempdir/tempdir2/tempdir3/fl4.f"]
+        
+        var f: TFile
+        
+        for fn in filesToCreate:
+            assert(f.open(fn, fmWrite))
+            f.close()
+        
+        # TODO scan and compare with
+        
+        #check r == 2
+        #removeDir("tempdir")
 
 #echo "null = " & $toEntityId(0)
 
