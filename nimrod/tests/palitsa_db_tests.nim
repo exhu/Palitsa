@@ -174,8 +174,28 @@ suite "db open suite":
             f.close()
         
         # TODO scan and compare with
+        var found: array[0..filesToCreate.high, bool]
+        for i in found.low..found.high: found[i] = false
         
-        #check r == 2
+        var si: TScanIface
+        si.onNewFile = proc(fn: string) =
+            var i = filesToCreate.find(fn)
+            if i >= 0:
+                found[i] = true
+                
+        si.onEnterDir = proc(fn: string) =
+            return
+                
+        si.onLeaveDir = proc(fn: string) =
+            return
+        
+        scanPath("tempdir", si)
+        
+        var foundCounter: int
+        for i in found:
+            foundCounter.inc
+                    
+        check foundCounter == filesToCreate.len
         #removeDir("tempdir")
 
 #echo "null = " & $toEntityId(0)

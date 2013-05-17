@@ -23,7 +23,7 @@ proc scanPath*(path: string, scanIface: TScanIface) =
         
             
     
-    
+discard """    
 var si: TScanIface
     
 si.onNewFile = proc(fn: string) = 
@@ -35,4 +35,5 @@ si.onLeaveDir = proc(fn: string) =
     echo("leaving dir = " & fn)
     
 scanPath "./", si
+"""
 
