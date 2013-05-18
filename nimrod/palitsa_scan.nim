@@ -3,9 +3,9 @@ import palitsa_db
 
 type
     TScanIface* = object
-        onNewFile: proc(fn: string) ## fn = full file name with path
-        onEnterDir: proc(fn: string)
-        onLeaveDir: proc(fn: string)
+        onNewFile*: proc(fn: string) ## fn = full file name with path
+        onEnterDir*: proc(fn: string)
+        onLeaveDir*: proc(fn: string)
 
 
 proc scanPath*(path: string, scanIface: TScanIface) =

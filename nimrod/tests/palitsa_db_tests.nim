@@ -173,7 +173,7 @@ suite "db open suite":
             assert(f.open(fn, fmWrite))
             f.close()
         
-        # TODO scan and compare with
+        # scan and compare with
         var found: array[0..filesToCreate.high, bool]
         for i in found.low..found.high: found[i] = false
         
@@ -196,7 +196,7 @@ suite "db open suite":
             foundCounter.inc
                     
         check foundCounter == filesToCreate.len
-        #removeDir("tempdir")
+        removeDir("tempdir")
 
 #echo "null = " & $toEntityId(0)
 
