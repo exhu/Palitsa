@@ -17,7 +17,7 @@ proc scanPath*(path: string, scanIface: TScanIface) =
         of pcDir:
             scanIface.onEnterDir(p)
             scanPath(p, scanIface)
-            scanIface.onLEaveDir(p)
+            scanIface.onLeaveDir(p)
         else:
             # not supported
         
