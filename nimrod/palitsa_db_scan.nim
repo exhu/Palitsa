@@ -22,8 +22,7 @@ proc addEntry(o: ptr TOpenDb, curDir: TEntityId, fn: string,
 proc addFsTree*(o: var TOpenDb, parent: TEntityId, path: string) =
     ## Scans filesystem and adds files/directories to specified 
     ## 'parent' TDirEntryDesc which is usually a generated root_id received
-    ## from createMedia().
-    echo "addTree"
+    ## from createMedia().    
     var 
         sif: TScanIface
         curDir = parent
@@ -45,6 +44,4 @@ proc addFsTree*(o: var TOpenDb, parent: TEntityId, path: string) =
     inTransaction(o):
         scanPath(path, sif)
     
-
-# TODO write unit test
 
