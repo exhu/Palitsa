@@ -1,6 +1,6 @@
 import times, parseutils, unittest, os
 
-import logging, palitsa_sqlutils, palitsa_db, palitsa_scan
+import logging, palitsa_sqlutils, palitsa_db, palitsa_scan, palitsa_db_scan
 
 suite "db open suite":
     var myDb: TOpenDb
@@ -197,6 +197,40 @@ suite "db open suite":
                     
         check foundCounter == filesToCreate.len
         removeDir("tempdir")
+        
+    test "addFsTree":
+        createDir("tempdir")
+        createDir("tempdir/tempdir1")
+        createDir("tempdir/tempdir2")
+        createDir("tempdir/tempdir2/tempdir3")
+        
+        let dirsCount = 4
+        
+        let filesToCreate = ["tempdir/fl1.a", "tempdir/fl2.b",
+            "tempdir/tempdir2/fl3.e", "tempdir/tempdir2/tempdir3/fl4.f"]
+            
+        block:
+            var f: TFile
+        
+            for fn in filesToCreate:
+                assert(f.open(fn, fmWrite))
+                f.close()
+        
+        var (media, root) = myDb.createMedia("tempdir", "tempdir", getTime())
+        
+        myDb.addFsTree(root, "tempdir")
+        
+        removeDir("tempdir")
+        
+        var 
+            mcount = myDb.countMedia()
+            ecount = myDb.countDirEntry()
+            
+        check mcount == 1
+        check ecount == (dirsCount + filesToCreate.len)
+        
+        # TODO findMediaIdFromDirEntryId
+        # TODO findByName, iterate...
 
 #echo "null = " & $toEntityId(0)
 
