@@ -229,8 +229,17 @@ suite "db open suite":
         check mcount == 1
         check ecount == (dirsCount + filesToCreate.len)
         
-        # TODO findMediaIdFromDirEntryId
-        # TODO findByName, iterate...
+        let searchFn = filesToCreate[filesToCreate.high].extractFilename()
+        var found = false
+        
+        for i in myDb.iterateDirEntry(0, ecount):
+            if searchFn == i.name:
+                found = true
+                echo i.name
+                
+        check found == true
+        
+        # TODO findByName, byParent
 
 #echo "null = " & $toEntityId(0)
 

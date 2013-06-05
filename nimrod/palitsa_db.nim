@@ -172,6 +172,7 @@ proc countDirEntry*(o: var TOpenDb): int64 =
     return countTabl(o, $ptDirEntryDesc)
 
 
+# TODO add iterate by parent, i.e. return direct sons of specified parent node
 iterator iterateDirEntry*(o: var TOpenDb, offset, limit: int64): TDirEntryDesc =
     ## iterate over all dir entries
     for e in iterateTabl[TDirEntryDesc](o, offset, limit):
