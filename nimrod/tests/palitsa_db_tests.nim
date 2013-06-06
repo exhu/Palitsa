@@ -231,15 +231,27 @@ suite "db open suite":
         
         let searchFn = filesToCreate[filesToCreate.high].extractFilename()
         var found = false
+        let testParent = "tempdir2"
+        let testChild = "fl3.e"
+        var testParentId: TEntityId
         
         for i in myDb.iterateDirEntry(0, ecount):
             if searchFn == i.name:
                 found = true
                 echo i.name
                 
+            if i.name == testParent:
+                testParentId = i.id
+                
         check found == true
+        check testParentId != NULL_ID
         
-        # TODO findByName, byParent
+        var foundChild = false
+        for i in myDb.iterateDirEntryByParent(testParentId, 0, ecount):
+            if i.name == testChild:
+                foundChild = true
 
+        check foundChild == true
+        
 #echo "null = " & $toEntityId(0)
 

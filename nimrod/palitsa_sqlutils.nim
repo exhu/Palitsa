@@ -217,13 +217,24 @@ proc countTabl*(o: var TOpenDb, tableName: string): int64 =
 iterator iterateTabl*[TEnt](o: var TOpenDb, offset, 
     limit: int64): TEnt =
     ## iterate over all table rows.
-    ## tableName = sql table name, desc = tuple.
-    ## returns entities via *yield*.
     var e: TEnt
     for r in o.conn.rows(sql("select "& e.columnsString &
         " from ? limit ? offset ?"), e.tableName, limit, offset):
         e.entityFieldsFromRowAll(r)
         yield e
+
+
+iterator iterateTablWhere*[TEnt](o: var TOpenDb, offset, 
+    limit: int64, whereCond: TaintedString): TEnt =
+    ## iterate over all table rows with "where $whereCond" conditional.
+    ## NOTE! whereCond is placed raw! UNSAFE!
+    var e: TEnt
+    for r in o.conn.rows(sql("select "& e.columnsString &
+        " from ? where " & whereCond & " limit ? offset ?"), e.tableName, limit,
+        offset):
+            e.entityFieldsFromRowAll(r)
+            yield e
+
 
 
 proc findRow*[TEnt](o: var TOpenDb, tableName: string,
