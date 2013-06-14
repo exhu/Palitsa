@@ -1,1 +1,2 @@
-TODO rename nimrod.cfg into palitsa_db.nimrod.cfg, use @include "palitsa_db.nimrod.cfg" for tests.cfg
+TODO rename nimrod.cfg into palitsa_db.nimrod.cfg, 
+use @include "palitsa_db.nimrod.cfg" for tests.cfg

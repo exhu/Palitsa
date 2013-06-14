@@ -1,6 +1,6 @@
 TODO:
 
-- media enumaration
+- media enumeration
 - direntry enumeration by media
 - direntry text descriptions display, edit
 - tags enumeration, add, rename, delete
