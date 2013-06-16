@@ -1,9 +1,32 @@
 TODO:
 
-- media enumeration
++ media enumeration
+    + iterateMedia
 - direntry enumeration by media
 - direntry text descriptions display, edit
 - tags enumeration, add, rename, delete
 - tags apply, remove
 - direntry recursive delete
 - media deletion
+
+CLI interace:
+    - open db, check for validity
+    - create db
+    - add media
+    - enum media
+    - enum tree for media
+    - enum files for media
+    - delete file
+    - delete tree
+    - delete media
+    - add tree to media
+    - add tags to entries
+    - remove tags
+    - enum tags
+    - delete tags
+    - display files by tags
+    - add description to file/dir
+    - delete description
+    - purge (optimize db by sqlite?)
+    
+    

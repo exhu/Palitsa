@@ -253,5 +253,13 @@ suite "db open suite":
 
         check foundChild == true
         
+    test "dir tree enum":
+        # TODO enumerate tree
+        var media = [("tempdir", false), ("dd2", false), ("m m3", false)]
+        for i in media:
+            discard myDb.createMedia(i[0], "tempdir", getTime())
+            
+        # TODO enumerate and set flag field to true
+        
 #echo "null = " & $toEntityId(0)
 

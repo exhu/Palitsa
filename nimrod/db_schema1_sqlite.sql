@@ -46,6 +46,7 @@ CREATE TABLE tag_dir_entry_assoc (id INTEGER PRIMARY KEY,
 -- need to show the tags attached to a certain directory entry, and vice versa
 CREATE INDEX tag_dir_entry_assoc_tag_idx ON tag_dir_entry_assoc (tag_id);
 CREATE INDEX tag_dir_entry_assoc_dir_idx ON tag_dir_entry_assoc (dir_entry_id);
+CREATE INDEX tag_desc_idx ON tag_desc (tag_name);
 
 -- index to speed up selection of child directory entries
 CREATE INDEX dir_entry_desc_parent_idx ON dir_entry_desc (parent_id);
