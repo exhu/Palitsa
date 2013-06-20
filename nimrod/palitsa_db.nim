@@ -188,7 +188,7 @@ iterator iterateDirEntryByParent*(o: var TOpenDb, parent: TEntityId,
 
 proc findMediaIdFromDirEntryId*(o: var TOpenDb, 
     dirEntryId: TEntityId): TEntityId =
-    # hierarchically find the root and get media desc id
+    ## hierarchically find the root and get media desc id
     var dent: TDirEntryDesc
     var nextId = dirEntryId
     
@@ -202,4 +202,5 @@ proc findMediaIdFromDirEntryId*(o: var TOpenDb,
         
     result.fromSqlVal(row[0])
     
+
 
