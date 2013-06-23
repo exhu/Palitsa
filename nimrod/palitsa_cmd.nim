@@ -8,15 +8,32 @@ proc initDb(o: var TOpenDb, args: openarray[string]) =
 proc enumMedia(o: var TOpenDb, args: openarray[string]) =
     # TODO
 
-proc enumDirTreeForMedia(o: var TOpenDb, mediaId: TEntityId) =
+
+proc addMedia(o: var TOpenDb, args: openarray[string]) =
+    # TODO
+
+proc removeMedia(o: var TOpenDb, args: openarray[string]) =
+    # TODO
+
+
+proc mediaTree(o: var TOpenDb, args: openarray[string]) =
     # TODO
     # iterateDirEntryByParent
     
+# -------
 
 let
-    commands = [("init", "create new db", initDb), 
-        ("lmedia", "List media", enumMedia)]
-    
+    commands = [("init", "create new db", initDb),
+        ("media_new", "<name> <path> Add media from directory tree.", 
+            addMedia),        
+        ("lmedia", "List available media", enumMedia),
+        ("media_tree", "<name> Dump tree", mediaTree),        
+        ("remove_media", "<name> Deletes media", removeMedia),
+    ]
+
+
+# ------
+
 proc displayHelp() =
     echo "Palitsa media catalog (C) 2012-2013 Yury Benesh"
     echo "palitsa_cmd <db_file> <command>"
@@ -25,6 +42,8 @@ proc displayHelp() =
         echo i[0] & " - " & i[1]
 
 
+# ------------------------------
+# ---------- MAIN --------------
 proc main() =    
     if paramCount() < 2:
         displayHelp()
