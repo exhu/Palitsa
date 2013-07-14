@@ -1,22 +1,33 @@
 ## command line tool for palitsa
-import palitsa_db, palitsa_sqlutils
-import os
+import palitsa_db, palitsa_sqlutils, palitsa_db_scan
+import os, times
 
-proc initDb(o: var TOpenDb, args: openarray[string]) =
+proc initDb(o: var TOpenDb, args: openarray[string]): bool =
     echo "Initialzied."
+    return true
 
-proc enumMedia(o: var TOpenDb, args: openarray[string]) =
+proc enumMedia(o: var TOpenDb, args: openarray[string]): bool =
+    # TODO
+    if args.len != 2:
+        echo "Expected name and path."
+        return false
+
+
+    #return true
+
+
+proc addMedia(o: var TOpenDb, args: openarray[string]): bool =
+    var (mediaId, rootId) = o.createMedia(args[0], args[1], getTime())
+    o.addFsTree(rootId, args[1])
+    return true
+    
+
+
+proc removeMedia(o: var TOpenDb, args: openarray[string]): bool =
     # TODO
 
 
-proc addMedia(o: var TOpenDb, args: openarray[string]) =
-    # TODO
-
-proc removeMedia(o: var TOpenDb, args: openarray[string]) =
-    # TODO
-
-
-proc mediaTree(o: var TOpenDb, args: openarray[string]) =
+proc mediaTree(o: var TOpenDb, args: openarray[string]):bool =
     # TODO
     # iterateDirEntryByParent
     
@@ -24,7 +35,7 @@ proc mediaTree(o: var TOpenDb, args: openarray[string]) =
 
 let
     commands = [("init", "create new db", initDb),
-        ("media_new", "<name> <path> Add media from directory tree.", 
+        ("amedia", "<name> <path> Add media from directory tree.", 
             addMedia),        
         ("lmedia", "List available media", enumMedia),
         ("media_tree", "<name> Dump tree", mediaTree),        
@@ -58,10 +69,11 @@ proc main() =
         
     o.openDb(paramStr(1), recreate = (paramStr(2) == "init"))
     var found = false
+    var error = false
     for i in commands:
         if i[0] == cmd:
             found = true
-            i[2](o, args)
+            error = i[2](o, args)
             break
     if not found:
         displayHelp()
