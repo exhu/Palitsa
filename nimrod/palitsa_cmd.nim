@@ -8,17 +8,19 @@ proc initDb(o: var TOpenDb, args: openarray[string]): bool =
 
 proc enumMedia(o: var TOpenDb, args: openarray[string]): bool =
     # TODO
-    if args.len != 2:
-        echo "Expected name and path."
-        return false
 
 
     #return true
 
 
 proc addMedia(o: var TOpenDb, args: openarray[string]): bool =
+    if args.len != 2:
+        echo "Expected name and path."
+        return false
+
     var (mediaId, rootId) = o.createMedia(args[0], args[1], getTime())
     o.addFsTree(rootId, args[1])
+    echo "Finished."
     return true
     
 
@@ -64,7 +66,7 @@ proc main() =
     let cmd = paramStr(2)
     var args:seq[string] = @[]
     if paramCount() > 2:
-        for i in countup(3, paramCount()-1):            
+        for i in countup(3, paramCount()):            
             args.add(paramStr(i))
         
     o.openDb(paramStr(1), recreate = (paramStr(2) == "init"))
