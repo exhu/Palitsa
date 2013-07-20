@@ -224,6 +224,14 @@ iterator iterateTabl*[TEnt](o: var TOpenDb, offset,
         yield e
 
 
+iterator iterateTabl*[TEnt](o: var TOpenDb): TEnt =
+    ## iterate over all table rows.
+    var e: TEnt
+    for r in o.conn.rows(sql("select "& e.columnsString &
+        " from ?"), e.tableName):
+        e.entityFieldsFromRowAll(r)
+        yield e
+
 iterator iterateTablWhere*[TEnt](o: var TOpenDb, offset, 
     limit: int64, whereCond: TaintedString): TEnt =
     ## iterate over all table rows with "where $whereCond" conditional.

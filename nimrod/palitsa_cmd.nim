@@ -7,10 +7,10 @@ proc initDb(o: var TOpenDb, args: openarray[string]): bool =
     return true
 
 proc enumMedia(o: var TOpenDb, args: openarray[string]): bool =
-    # TODO
+    for i in o.iterateMedia():
+        echo($i.id & "\t" & $i.name & "\t" & $i.originalPath)
 
-
-    #return true
+    return true
 
 
 proc addMedia(o: var TOpenDb, args: openarray[string]): bool =

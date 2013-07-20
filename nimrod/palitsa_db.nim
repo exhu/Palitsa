@@ -166,7 +166,11 @@ iterator iterateMedia*(o: var TOpenDb, offset, limit: int64): TMediaDesc =
         limit):
         yield e
     
-
+iterator iterateMedia*(o: var TOpenDb): TMediaDesc =
+    ## iterate over all media descriptors
+    for e in iterateTabl[TMediaDesc](o):
+        yield e
+ 
 proc countDirEntry*(o: var TOpenDb): int64 =
     ## Counts amount of directory entries stored in the db.
     return countTabl(o, $ptDirEntryDesc)
