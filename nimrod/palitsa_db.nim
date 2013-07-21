@@ -145,8 +145,22 @@ proc createEntry*(o: var TOpenDb, e: var TDirEntryDesc): TEntityId {.
 proc findMedia*(o: var TOpenDb, id: TEntityId, outM: var TMediaDesc): bool =
     ## Read media by id, return false if no such media
     return findRow(o, outM.tableName, id, outM)
-              
- 
+
+
+proc findMediaByName*(o: var TOpenDb, name: string, 
+    outM: var TMediaDesc): bool =
+    ## Read media by id, return false if no such media
+
+    var row = o.conn.getRow(sql("select "& outM.columnsString &
+        " from ? where name = ?"), outM.tableName, name)
+
+    if row.len > 0 and row[0].len > 0:
+        outM.entityFieldsFromRowAll(row)
+        return true
+
+    return false
+
+
 proc findEntry*(o: var TOpenDb, id: TEntityId, outE: var TDirEntryDesc): bool =
     ## Read entry by id, return false if no such entry
     return findRow(o, outE.tableName, id, outE)
@@ -189,6 +203,12 @@ iterator iterateDirEntryByParent*(o: var TOpenDb, parent: TEntityId,
             yield e
 
 
+iterator iterateDirEntryByParent*(o: var TOpenDb, 
+    parent: TEntityId): TDirEntryDesc =
+    ## iterate over all table rows where parent = specified one.
+    for e in iterateTablWhere[TDirEntryDesc](o, "parent_id = " &
+        $parent):
+            yield e
 
 proc findMediaIdFromDirEntryId*(o: var TOpenDb, 
     dirEntryId: TEntityId): TEntityId =

@@ -244,6 +244,16 @@ iterator iterateTablWhere*[TEnt](o: var TOpenDb, offset,
             yield e
 
 
+iterator iterateTablWhere*[TEnt](o: var TOpenDb,
+    whereCond: TaintedString): TEnt =
+    ## iterate over all table rows with "where $whereCond" conditional.
+    ## NOTE! whereCond is placed raw! UNSAFE!
+    var e: TEnt
+    for r in o.conn.rows(sql("select "& e.columnsString &
+        " from ? where " & whereCond), e.tableName):
+            e.entityFieldsFromRowAll(r)
+            yield e
+
 
 proc findRow*[TEnt](o: var TOpenDb, tableName: string,
     id: TEntityId, outM: var TEnt): bool =
