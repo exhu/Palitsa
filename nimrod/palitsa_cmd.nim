@@ -32,7 +32,7 @@ proc removeMedia(o: var TOpenDb, args: openarray[string]): bool =
 proc dumpTree(o: var TOpenDb, parent: TEntityId, level: int) =
     var ident = ""
     for i in countup(0, level):
-        ident &= " "
+        ident &= "| "
 
     for i in o.iterateDirEntryByParent(parent):
         echo(ident, i.name)
