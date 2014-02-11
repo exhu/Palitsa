@@ -1,7 +1,11 @@
 TODO:
 
+- fix crash on IO error, list files which cannot be accessed
+- add media flag to sql indicating skipped files due to IO error
 + media enumeration
     + iterateMedia
+    - by ID
+
 - direntry enumeration by media
 - direntry text descriptions display, edit
 - tags enumeration, add, rename, delete
