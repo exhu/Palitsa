@@ -18,7 +18,7 @@ suite "db open suite":
         try:
             myDb.beginTransaction
         except EMultiTransaction:
-            nil
+            discard
         
         finally:
             myDb.endTransaction(rollback = true)
