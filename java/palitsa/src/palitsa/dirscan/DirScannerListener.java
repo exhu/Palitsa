@@ -15,5 +15,4 @@ public interface DirScannerListener {
     void onEnterDir(String path);
     void onLeaveDir();
     void onNoAccess(String path);
-    
 }
