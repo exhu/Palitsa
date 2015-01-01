@@ -5,3 +5,5 @@
 /javaport/palitsa_core/nbproject/private/
 /javaport/thirdparty/*.jar
 
+/javaport/palitsa_core/build/
+/javaport/palitsa_core/dist/

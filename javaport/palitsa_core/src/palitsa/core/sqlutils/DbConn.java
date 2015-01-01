@@ -18,13 +18,14 @@ import java.util.logging.Logger;
  * @author yur
  */
 public final class DbConn {
+    private static final Logger logger = Logger.getLogger(DbConn.class.getName());
 
     public static DbConn openFile(String fn) {
         DbConn cn = null;
         try {
             cn = new DbConn(fn);
         } catch (Exception e) {
-            Logger.getLogger(DbConn.class.getName()).log(Level.SEVERE, null, e);
+            logger.log(Level.SEVERE, null, e);
         }
 
         return cn;
@@ -37,8 +38,40 @@ public final class DbConn {
             conn.close();
             conn = null;
         } catch (SQLException ex) {
-            Logger.getLogger(DbConn.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void runTransaction(TransactionBody b) {
+        runTransaction(b, false);
+    }
+    //@SuppressWarnings("unchecked")
+    public void runTransaction(TransactionBody b, boolean forceRollback) {
+        if (inTransaction)
+            throw new MultiTransactionError();
+        
+        try {
+            inTransaction = true;
+            b.run();
+            if (!forceRollback)
+                conn.commit();
+            else
+                conn.rollback();
+        }
+        catch(Exception e) {
+            inTransaction = false;
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+
+            RuntimeException re = (RuntimeException)e;
+            if (re != null) {
+                throw re;
+            }
+        }
+        
     }
 
     protected DbConn(String fn) throws SQLException {
@@ -57,7 +90,7 @@ public final class DbConn {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DbConn.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 }

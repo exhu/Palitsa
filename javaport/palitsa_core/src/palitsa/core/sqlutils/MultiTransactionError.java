@@ -9,6 +9,6 @@ package palitsa.core.sqlutils;
  *
  * @author yur
  */
-public class MultiTransactionError extends Exception {
+public class MultiTransactionError extends RuntimeException {
     
 }
