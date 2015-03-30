@@ -33,7 +33,7 @@ type
         path: string
         name: string
         fileSize: int64
-        mTime: TTime
+        mTime: Time
         isDir: bool
         descId: TEntityId 
 
@@ -43,7 +43,7 @@ type
         id: TEntityId
         name: string
         originalPath: string
-        scanTime: TTime
+        scanTime: Time
         rootId: TEntityId
         
 # -----
@@ -70,10 +70,11 @@ proc openDb*(o: var TOpenDb, fn: string, recreate: bool = false) =
     o.conn = db_sqlite.open(fn, "", "", "")
     if recreate:
         let script = parseSqlFile(PALITSA_SCHEMA_FILE)
-        inTransaction(o):
+        o.inTransaction():
             for i in script:
                 #echo "executing '" & i & "'..."
-                db_sqlite.exec o.conn, sql(i)
+                let q = sql(i)
+                db_sqlite.exec(o.conn, q)
     
     # check for proper version number
     var ver = db_sqlite.getValue(o.conn, sql"select version_num from db_desc")
@@ -104,7 +105,7 @@ proc genIdFor*(o: var TOpenDb, t: TPalTable, n = 1): TEntityId =
     
 
 
-proc createMedia*(o: var TOpenDb, name, path: string, scanTime: TTime): 
+proc createMedia*(o: var TOpenDb, name, path: string, scanTime: Time): 
     tuple[mediaId, rootId: TEntityId] =
     ## Creates media_desc, and root node and returs the IDs.
     result.mediaId = o.genIdFor(ptMediaDesc)

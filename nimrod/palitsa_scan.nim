@@ -20,6 +20,7 @@ proc scanPath*(path: string, scanIface: TScanIface) =
             scanIface.onLeaveDir(p)
         else:
             # not supported
+            discard
         
             
     

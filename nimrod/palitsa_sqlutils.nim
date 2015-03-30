@@ -50,7 +50,7 @@ proc parseId(s: string): TEntityId =
         return toEntityId(i)
     if s == "" or s == "NULL" or s == "null":
         return NULL_ID
-    raise newException(EInvalidValue, "Failed parseId for " & s)
+    raise newException(ValueError, "Failed parseId for " & s)
 
 
 proc toSqlVal*(e: string): string = e
@@ -62,23 +62,23 @@ proc fromSqlVal*(e: var TEntityId, s: string) =
     e = parseId(s)
 
 
-proc timeToSqlString(t: TTime): string =
+proc timeToSqlString(t: Time): string =
     ## encodes time to SQL string/number, current implementation uses int64
     return $int64(t)
 
-proc timeFromSqlString(s: string): TTime =
+proc timeFromSqlString(s: string): Time =
     ## decodes time from SQL result string/number, current implementation uses
     ## int64
     var i: int64
     if parseBiggestInt(s, i) > 0:
-        return TTime(i)
+        return Time(i)
 
-    raise newException(EInvalidValue, "failed timeFromSqlString for " & s)
+    raise newException(ValueError, "failed timeFromSqlString for " & s)
 
 
 
-proc toSqlVal*(t: TTime): string = timeToSqlString(t)
-proc fromSqlVal*(t: var TTime, s: string) =
+proc toSqlVal*(t: Time): string = timeToSqlString(t)
+proc fromSqlVal*(t: var Time, s: string) =
     t = timeFromSqlString(s)
 
 
@@ -89,7 +89,7 @@ proc parseInt64(s: string): int64 =
     if parseBiggestInt(s, i) > 0:
         return i
 
-    raise newException(EInvalidValue, "failed parseInt64 for " & s)
+    raise newException(ValueError, "failed parseInt64 for " & s)
 
 
 proc toSqlVal*(i: int64): string = $i
@@ -102,14 +102,14 @@ proc fromSqlVal*(i: var int64, s: string) =
 proc fromSqlVal*(i: var int32, s: string) =
     var ip = parseInt64(s)
     if (ip < int32.low) or (ip > int32.high):
-        raise newException(EOverflow, "fromSqlVal int32 overflow")
+        raise newException(OverflowError, "fromSqlVal int32 overflow")
     else:
         i = int32(ip)
 
 proc fromSqlVal*(i: var int, s: string) = 
     var ip = parseInt64(s)
     if (ip < int.low) or (ip > int.high):
-        raise newException(EOverflow, "fromSqlVal int overflow")
+        raise newException(OverflowError, "fromSqlVal int overflow")
     else:
         i = int(ip)
 
@@ -128,7 +128,7 @@ proc parseSqlBool(s: string): bool =
     if parseInt(s, i) > 0:
         return i != 0
 
-    raise newException(EInvalidValue, "failed parseSqlBool for " & s)
+    raise newException(ValueError, "failed parseSqlBool for " & s)
 
 
 
@@ -144,7 +144,7 @@ proc fromSqlVal*(b: var bool, s: string) =
 proc beginTransaction*(o: var TOpenDb)
 proc endTransaction*(o: var TOpenDb, rollback: bool = false)
 
-template InTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
+template inTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
     ## rollbacks on exception and reraises error.
     ## you can force rollback by rollback = true, e.g. for testing
     o.beginTransaction
@@ -156,9 +156,9 @@ template InTransaction*(o: var TOpenDb, rollback:bool, stmts: stmt) =
       raise
 
 
-template InTransaction*(o: var TOpenDb, stmts: stmt) =
+template inTransaction*(o: var TOpenDb, stmts: stmt) =
     ## rollbacks on exception and reraises error, commits on success.
-    InTransaction(o, rollback = false):
+    inTransaction(o, rollback = false):
         stmts
 
 
@@ -268,8 +268,8 @@ proc findRow*[TEnt](o: var TOpenDb, tableName: string,
         outM.entityFieldsFromRowAll(row)
         return true
 
-
-proc indexOf*(t: typedesc, name: string): int  {.compiletime.} =
+{.warning: "make compileTime when compiler gets fixed!".}
+proc indexOf*(t: typedesc, name: string): int  =
     ## takes a tuple and looks for the field by name.
     ## returs index of that field.
     var 
@@ -279,7 +279,7 @@ proc indexOf*(t: typedesc, name: string): int  {.compiletime.} =
         if n == name: return i
         i.inc
         
-    raise newException(EInvalidValue, "No field " & name & " in type " & 
+    raise newException(ValueError, "No field " & name & " in type " & 
         astToStr(t))
 
 
@@ -326,7 +326,7 @@ proc parseLine(p : RSQLParser, s: string) =
 
 
 
-proc ParseSqlFile*(fn : string) : TStatements =
+proc parseSqlFile*(fn : string) : TStatements =
     ## reads sql script and splits it into statements
     var p : RSqlParser
     new(p)

@@ -45,7 +45,7 @@ suite "db open suite":
             
             
         inTransaction(myDb):
-            var t: TTime
+            var t: Time
             var m = myDb.createMedia("name", "path", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
             mediaId = m.mediaId
@@ -74,9 +74,9 @@ suite "db open suite":
             
         
     test "time storage":
-        # TTime <> int64 test
+        # Time <> int64 test
 
-        var t = GetTime()
+        var t = getTime()
         echo "template time = " & $t
         var s = t.toSqlVal
         t.fromSqlVal(s)
@@ -92,7 +92,7 @@ suite "db open suite":
             medToFind: TEntityId
             
         inTransaction(myDb):
-            var t: TTime
+            var t: Time
             var m = myDb.createMedia("name", "path", t)
             echo "mediaId  = " & $m.mediaId & ", rootId = " & $m.rootId
             
@@ -129,7 +129,7 @@ suite "db open suite":
     test "iterateMedia, dirEntry":
             
         inTransaction(myDb):
-            var t: TTime
+            var t: Time
             var m = myDb.createMedia("name1", "path1", t)
             m = myDb.createMedia("name2", "path2", t)
         
@@ -152,11 +152,12 @@ suite "db open suite":
             
         check iterEntries == 2
         
-        
+    #discard """    
     test "indexOf":
         #echo "indexOf test disabled!"
         let r = TMediaDesc.indexOf("originalPath")
         check r == 2
+    #    """
         
     test "scan":
         createDir("tempdir")
@@ -167,7 +168,7 @@ suite "db open suite":
         let filesToCreate = ["tempdir/fl1.a", "tempdir/fl2.b",
             "tempdir/tempdir2/fl3.e", "tempdir/tempdir2/tempdir3/fl4.f"]
         
-        var f: TFile
+        var f: File
         
         for fn in filesToCreate:
             assert(f.open(fn, fmWrite))
@@ -210,7 +211,7 @@ suite "db open suite":
             "tempdir/tempdir2/fl3.e", "tempdir/tempdir2/tempdir3/fl4.f"]
             
         block:
-            var f: TFile
+            var f: File
         
             for fn in filesToCreate:
                 assert(f.open(fn, fmWrite))
